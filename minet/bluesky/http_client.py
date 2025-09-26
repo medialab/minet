@@ -1,12 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from typing import Iterator, Iterable, Optional, Any, List, Dict
 
 from time import time, sleep
 from ebbe import as_reconciled_chunks
 
+from twitwi.utils import get_dates
 from twitwi.bluesky import normalize_profile, normalize_post
 from twitwi.bluesky.types import BlueskyPost, BlueskyProfile
-from twitwi.constants import FORMATTED_FULL_DATETIME_FORMAT, SOURCE_DATETIME_FORMAT_V2
+from twitwi.constants import SOURCE_DATETIME_FORMAT_V2
 
 from minet.web import (
     create_request_retryer,
@@ -139,20 +140,17 @@ class BlueskyHTTPClient:
         url: Optional[str] = None,
     ) -> Iterator[BlueskyPost]:
         cursor = None
-        oldest_post = None
         oldest_post_uris: set[str] = set()
-        time_published_of_oldest_post = None
-        timestamp_utc_of_oldest_post = None
-        normalized_posts: List[BlueskyPost] = []
+        new_oldest_post_uris: set[str] = set()
+        oldest_post_timestamp_utc = None  # has millisecond precision
 
-        # Search with time seems to work with millisecond precision, but as timestamp is in seconds, we are using a 1 second overlap
+        # Search with time seems to work with millisecond precision
         time_overlap = 1
-        time_overlap_delta = timedelta(seconds=time_overlap)
 
         # to avoid infinite loop when we find the final post,
         # as it will always appears in the next request because of the time overlap for paging with time range
         oldest_date_changed: bool = False
-        oldest_uris_changed: bool = False
+        oldest_uris_len_changed: bool = False
         old_len_oldest_post_uris = 0
 
         while True:
@@ -174,82 +172,73 @@ class BlueskyHTTPClient:
             if "posts" not in data or len(data["posts"]) == 0:
                 break
 
-            normalized_posts.clear()
+            oldest_date_changed = False
+            old_len_oldest_post_uris = len(oldest_post_uris)
+            new_oldest_post_uris.clear()
 
             for post in data["posts"]:
-                normalized_post = normalize_post(post)
-                normalized_posts.append(normalized_post)
                 # We're using the uri as a unique identifier for posts, as it exists cids that are not unique
                 if post["uri"] in oldest_post_uris:
                     continue
 
                 # TODO : handle locale + extract_referenced_posts + collected_via
-                yield normalized_post
+                yield normalize_post(post)
 
                 # Taking the minimum createdAt time to avoid issues
                 # with posts not being perfectly sorted by createdAt (local_time parameter is createdAt in UTC)
                 # TODO: handle locale timezone wanted by user
+                post_timestamp_utc = get_dates(
+                    post["record"]["createdAt"],
+                    source="bluesky",
+                    millisecond_timestamp=True,
+                )[0]
                 if (
-                    oldest_post
-                    and oldest_post["local_time"][:-3]
-                    < normalized_post["local_time"][:-3]
+                    oldest_post_timestamp_utc
+                    and oldest_post_timestamp_utc <= post_timestamp_utc
                 ):
+                    if post_timestamp_utc == oldest_post_timestamp_utc:
+                        # adding posts within the time range of the oldest post to the "already seen uris" list,
+                        # because they will be in the next request because of the little
+                        # (but still existing) time overlap for paging with time range
+                        if not oldest_date_changed:
+                            oldest_post_uris.add(post["uri"])
+                        else:
+                            # Not changing oldest_post_uris yet, as we still need to check all posts in this request,
+                            # in case we (unfortunately and unlikely) encounter an already seen post (in the previous request to the API)
+                            # that is older than the current post date (as said, it's unlikely to happen, but we must handle it anyway)
+                            new_oldest_post_uris.add(post["uri"])
                     continue
-                oldest_post = normalized_post
 
-            new_time_published_of_oldest_post = oldest_post["local_time"]
-            new_timestamp_utc_of_oldest_post = oldest_post["timestamp_utc"]
-
-            oldest_date_changed = False
-
-            if (
-                timestamp_utc_of_oldest_post
-                and new_timestamp_utc_of_oldest_post < timestamp_utc_of_oldest_post
-            ):
                 oldest_date_changed = True
+                new_oldest_post_uris.clear()
+                new_oldest_post_uris.add(post["uri"])
+                oldest_post_timestamp_utc = post_timestamp_utc
+
+            if oldest_date_changed:
                 oldest_post_uris.clear()
-
-            time_published_of_oldest_post = new_time_published_of_oldest_post
-            timestamp_utc_of_oldest_post = new_timestamp_utc_of_oldest_post
-
-            # adding posts within the time range of the oldest post to the "already seen uris" list,
-            # because they will be in the next request because of the little
-            # (but still existing) time overlap for paging with time range
-            time_published_of_oldest_post_dt = datetime.strptime(
-                time_published_of_oldest_post, FORMATTED_FULL_DATETIME_FORMAT
-            )
-            time_published_of_oldest_post_plus_delta_dt = (
-                time_published_of_oldest_post_dt + time_overlap_delta
-            )
-
-            timestamp_utc_of_oldest_post_plus_delta = (
-                timestamp_utc_of_oldest_post + time_overlap
-            )
-
-            old_len_oldest_post_uris = len(oldest_post_uris)
-
-            for post in sorted(normalized_posts, key=lambda p: p["timestamp_utc"]):
-                timestamp_utc_of_post = post["timestamp_utc"]
-
-                if timestamp_utc_of_post > timestamp_utc_of_oldest_post_plus_delta:
-                    break
-                oldest_post_uris.add(post["uri"])
+                oldest_post_uris = new_oldest_post_uris.copy()
+                new_oldest_post_uris.clear()
 
             # We are not changing the oldest_post_uris manually in the loop,
             # as oldest_post_uris is only changed by adding NEW uris,
-            # and uris already in the set are ignored when added again, i.e. the set isn't changed.
-            oldest_uris_changed = len(oldest_post_uris) != old_len_oldest_post_uris
+            # and uris already in the set are ignored when added again, i.e. the set isn't changed,
+            # except in the case where the oldest post date changes.
+            oldest_uris_len_changed = len(oldest_post_uris) != old_len_oldest_post_uris
 
             cursor = data.get("cursor")
 
             if cursor is None:
-                until = time_published_of_oldest_post_plus_delta_dt.strftime(
-                    SOURCE_DATETIME_FORMAT_V2
+                # NOTE: the until flag is exclusive
+                oldest_post_timestamp_utc_plus_delta = (
+                    oldest_post_timestamp_utc + time_overlap
                 )
+                until = datetime.fromtimestamp(
+                    oldest_post_timestamp_utc_plus_delta / 1000, tz=timezone.utc
+                ).strftime(SOURCE_DATETIME_FORMAT_V2)
 
             # If the oldest post date did not change, and no new uris were added to the "already seen uris" list,
             # it means we have reached the end of the available posts
-            if not oldest_uris_changed and not oldest_date_changed:
+            if not oldest_uris_len_changed and not oldest_date_changed:
                 break
 
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
