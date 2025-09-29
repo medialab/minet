@@ -33,7 +33,7 @@ BLUESKY_FOLLOWS_COMMAND = command(
     """,
     arguments=[
         {
-            "flag": "--limit",
+            "flags": ["-l", "--limit"],
             "type": int,
             "help": "Limit the number of follows to retrieve for each user. Will collect all follows by default.",
         },
@@ -67,7 +67,7 @@ BLUESKY_FOLLOWERS_COMMAND = command(
     """,
     arguments=[
         {
-            "flag": "--limit",
+            "flags": ["-l", "--limit"],
             "type": int,
             "help": "Limit the number of followers to retrieve for each user. Will collect all followers by default.",
         },
@@ -163,7 +163,7 @@ BLUESKY_USER_POSTS_COMMAND = command(
     variadic_input={"dummy_column": "handle-or-did"},
     arguments=[
         {
-            "flag": "--limit",
+            "flags": ["-l", "--limit"],
             "type": int,
             "help": "Limit the number of posts to retrieve for each user. Will collect all posts by default.",
         },
@@ -252,7 +252,7 @@ BLUESKY_SEARCH_PROFILES_COMMAND = command(
     variadic_input={"dummy_column": "query"},
     arguments=[
         {
-            "flag": "--limit",
+            "flags": ["-l", "--limit"],
             "type": int,
             "help": "Limit the number of users to retrieve for each query. Will collect all users by default.",
         },
