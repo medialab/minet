@@ -126,12 +126,8 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
-    def search_profiles(
-        self, query: str, limit: Optional[int] = -1
-    ) -> Iterator[BlueskyPartialProfile]:
+    def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
-
-        count = 0
         while True:
             url = self.urls.search_profiles(query, cursor=cursor)
 
@@ -140,13 +136,10 @@ class BlueskyHTTPClient:
 
             for profile in data["actors"]:
                 yield normalize_partial_profile(profile)
-                count += 1
-                if count == limit:
-                    break
 
             cursor = data.get("cursor")
 
-            if cursor is None or count == limit:
+            if cursor is None:
                 break
 
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
@@ -170,12 +163,9 @@ class BlueskyHTTPClient:
 
         return format_post_at_uri(did, rkey)
 
-    def get_follows(
-        self, did: str, limit: Optional[int] = -1
-    ) -> Iterator[BlueskyPartialProfile]:
+    def get_follows(self, did: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
-        count = 0
         while True:
             url = self.urls.get_follows(did, cursor=cursor)
 
@@ -184,21 +174,15 @@ class BlueskyHTTPClient:
 
             for profile in data["follows"]:
                 yield normalize_partial_profile(profile)
-                count += 1
-                if count == limit:
-                    break
 
             cursor = data.get("cursor")
 
-            if cursor is None or count == limit:
+            if cursor is None:
                 break
 
-    def get_followers(
-        self, did: str, limit: Optional[int] = -1
-    ) -> Iterator[BlueskyPartialProfile]:
+    def get_followers(self, did: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
-        count = 0
         while True:
             url = self.urls.get_followers(did, cursor=cursor)
 
@@ -207,13 +191,10 @@ class BlueskyHTTPClient:
 
             for profile in data["followers"]:
                 yield normalize_partial_profile(profile)
-                count += 1
-                if count == limit:
-                    break
 
             cursor = data.get("cursor")
 
-            if cursor is None or count == limit:
+            if cursor is None:
                 break
 
     # NOTE: this API route does not return any results for at-uris containing handles!
@@ -237,12 +218,9 @@ class BlueskyHTTPClient:
             else:
                 yield normalize_post(post_data)
 
-    def get_user_posts(
-        self, did: str, limit: Optional[int] = -1
-    ) -> Iterator[BlueskyPost]:
+    def get_user_posts(self, did: str) -> Iterator[BlueskyPost]:
         cursor = None
 
-        count = 0
         while True:
             url = self.urls.get_user_posts(did, cursor=cursor)
 
@@ -252,13 +230,10 @@ class BlueskyHTTPClient:
             for post in data["feed"]:
                 # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post)
-                count += 1
-                if count == limit:
-                    break
 
             cursor = data.get("cursor")
 
-            if cursor is None or count == limit:
+            if cursor is None:
                 break
 
     def get_profiles(self, identifiers: Iterable[str]) -> Iterator[BlueskyProfile]:

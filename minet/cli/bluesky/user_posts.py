@@ -1,5 +1,7 @@
 from casanova import Enricher
 
+from itertools import islice
+
 from twitwi.bluesky.constants import POST_FIELDS
 from twitwi.bluesky import format_post_as_csv_row
 
@@ -28,7 +30,10 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
         else:
             did = user
         with loading_bar.step(did):
-            for post in client.get_user_posts(did, limit=cli_args.limit):
+            for post in islice(
+                client.get_user_posts(did),
+                int(cli_args.limit) if cli_args.limit else None,
+            ):
                 post_row = format_post_as_csv_row(post)
                 enricher.writerow(row, post_row)
                 loading_bar.nested_advance()

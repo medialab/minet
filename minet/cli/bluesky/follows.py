@@ -1,5 +1,7 @@
 from casanova import Enricher
 
+from itertools import islice
+
 from twitwi.bluesky.constants import PARTIAL_PROFILE_FIELDS
 from twitwi.bluesky import format_partial_profile_as_csv_row
 
@@ -34,7 +36,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
             sub_total = next(client.get_profiles([did]))["follows"]
 
         with loading_bar.step(did, sub_total=sub_total):
-            for follow in client.get_follows(did, cli_args.limit):
+            for follow in islice(client.get_follows(did), sub_total):
                 follow_row = format_partial_profile_as_csv_row(follow)
                 enricher.writerow(row, follow_row)
                 loading_bar.nested_advance()
