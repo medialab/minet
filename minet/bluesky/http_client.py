@@ -279,5 +279,11 @@ class BlueskyHTTPClient:
             return data.get(identifier)
 
         for _, profile_data in as_reconciled_chunks(25, identifiers, work, reconcile):
+            if (
+                not profile_data
+            ):  # in case the profile was not found (e.g. non-existing user)
+                yield None
+                continue
+
             # TODO: handle locale + collected_via
             yield normalize_profile(profile_data)
