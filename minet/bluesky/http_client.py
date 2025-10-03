@@ -236,7 +236,9 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
-    def get_profiles(self, identifiers: Iterable[str]) -> Iterator[BlueskyProfile]:
+    def get_profiles(
+        self, identifiers: Iterable[Optional[str]]
+    ) -> Iterator[BlueskyProfile]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_profiles(chunk)
             response = self.request(url)

@@ -1,4 +1,4 @@
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Optional
 
 from casanova import Enricher
 
@@ -25,27 +25,27 @@ from minet.bluesky import BlueskyHTTPClient
 def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
-    def work(users: Iterable[str]) -> Iterator[BlueskyProfile]:
-        dids = []
+    def mixed_handles_and_dids_to_dids(users: Iterable[str]) -> Iterator[Optional[str]]:
         for user in users:
             if user.startswith("did:"):
-                did = user
+                yield user
             else:
                 try:
-                    did = client.resolve_handle(user, True)
+                    yield client.resolve_handle(user, True)
                 except KeyError:  # in case the user does not exist
-                    did = None
+                    yield None
                 except Exception as e:
                     raise e
-            dids.append(did)
+
+    def work(users: Iterable[str]) -> Iterator[BlueskyProfile]:
+        dids = mixed_handles_and_dids_to_dids(users)
         return client.get_profiles(dids)
 
-    with loading_bar.step(count=cli_args.total):
-        for (row, _), profile in outer_zip(
-            enricher.cells(cli_args.column, with_rows=True),
-            key=lambda x: x[1],
-            work=work,
-        ):
+    for (row, _), profile in outer_zip(
+        enricher.cells(cli_args.column, with_rows=True),
+        key=lambda x: x[1],
+        work=work,
+    ):
+        with loading_bar.step():
             profile_row = format_profile_as_csv_row(profile) if profile else None
             enricher.writerow(row, profile_row)
-            loading_bar.advance()
