@@ -28,24 +28,24 @@ from minet.bluesky import BlueskyHTTPClient
 def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
-    def work(users: Iterable[str]) -> Iterator[BlueskyPost]:
-        return client.get_posts(
-            [
-                param
-                if param.startswith(
-                    "at://did:"
-                )  # In case the user passed full URLs instead of at:// URIs
-                else client.resolve_post_url(param)
-                for param in users
-            ]
-        )
+    def mixed_urls_and_uris_to_uris(params: Iterable[str]) -> Iterator[str]:
+        for param in params:
+            # In case the user passed full URLs instead of at:// URIs
+            if param.startswith("at://did:"):
+                yield param
+            else:
+                yield client.resolve_post_url(param)
+
+    def work(params: Iterable[str]) -> Iterator[BlueskyPost]:
+        uris = mixed_urls_and_uris_to_uris(params)
+        return client.get_posts(uris)
 
     for (row, _), post in outer_zip(
         enricher.cells(cli_args.column, with_rows=True), key=lambda x: x[1], work=work
     ):
-        post_row = format_post_as_csv_row(post)
-        enricher.writerow(row, post_row)
-        loading_bar.advance()
+        with loading_bar.step():
+            post_row = format_post_as_csv_row(post) if post else None
+            enricher.writerow(row, post_row)
 
 
 @with_bluesky_fatal_errors
@@ -60,22 +60,26 @@ def action_raw(cli_args, loading_bar: LoadingBar):
     reader = casanova.reader(cli_args.input, total=cli_args.total)
     writer = ndjson.writer(cli_args.output)
 
-    params: list[str] = list(reader.cells(cli_args.column, with_rows=False))
+    params = reader.cells(cli_args.column, with_rows=False)
 
-    # with loading_bar.step(count=len(params)):
-    for post in client.get_posts(
-        [
-            param
-            if param.startswith(
-                "at://did:"
-            )  # In case the user passed full URLs instead of at:// URIs
-            else client.resolve_post_url(param)
-            for param in params
-        ],
-        return_raw=True,
-    ):
-        writer.writerow(post)
-        loading_bar.advance()
+    def mixed_urls_and_uris_to_uris(params: Iterable[str]) -> Iterator[str]:
+        for param in params:
+            # In case the user passed full URLs instead of at:// URIs
+            if param.startswith("at://did:"):
+                yield param
+            else:
+                yield client.resolve_post_url(param)
+
+    def work(uris: Iterable[str]) -> Iterator[str]:
+        return client.get_posts(uris, return_raw=True)
+
+    uris = mixed_urls_and_uris_to_uris(params)
+
+    loading_bar.set_total(reader.total)
+
+    for uri, post_payload in outer_zip(uris, key=lambda x: x, work=work):
+        with loading_bar.step():
+            writer.writerow({"uri": uri, "post": post_payload})
 
 
 def action(cli_args):

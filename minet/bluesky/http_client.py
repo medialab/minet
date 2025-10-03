@@ -212,6 +212,9 @@ class BlueskyHTTPClient:
             return data.get(uri)
 
         for _, post_data in as_reconciled_chunks(25, did_at_uris, work, reconcile):
+            if not post_data:  # in case the post was not found (e.g. non-existing post)
+                yield None
+                continue
             if return_raw:
                 yield post_data
             # TODO : handle locale + extract_referenced_posts + collected_via
