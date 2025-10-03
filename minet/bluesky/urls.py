@@ -71,11 +71,36 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
         )
 
     def search_posts(
-        self, q: str, cursor: Optional[str] = None, limit: int = 100
+        self,
+        q: str,
+        cursor: Optional[str] = None,
+        limit: int = 100,
+        lang: Optional[str] = None,
+        since: Optional[str] = None,
+        until: Optional[str] = None,
+        mentions: Optional[str] = None,
+        author: Optional[str] = None,
+        domain: Optional[str] = None,
+        url: Optional[str] = None,
     ) -> str:
+        args = {
+            "q": q,
+            "cursor": cursor,
+            "limit": limit,
+            "lang": lang,
+            "since": since,
+            "until": until,
+            "mentions": mentions,
+            "author": author,
+            "domain": domain,
+            "url": url,
+        }
+        # NOTE : At the moment, we cannot use the tag argument of the API properly, as for now it seems to not work at all.
+        # An issue has been opened on the Bluesky repo about it: https://github.com/bluesky-social/atproto/issues/3301
+
         return self.format(
             path="app.bsky.feed.searchPosts",
-            args={"q": q, "cursor": cursor, "limit": limit},
+            args=args,
         )
 
     def search_profiles(

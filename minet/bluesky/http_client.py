@@ -1,10 +1,13 @@
 from typing import Iterator, Iterable, Optional, Any, List, Dict, Union
 
 from time import time, sleep
+from datetime import datetime, timezone
 from ebbe import as_reconciled_chunks
 
-from twitwi.bluesky import normalize_profile, normalize_partial_profile, normalize_post
+from twitwi.utils import get_dates
+from twitwi.bluesky import normalize_profile, normalize_post, normalize_partial_profile
 from twitwi.bluesky.types import BlueskyPost, BlueskyProfile, BlueskyPartialProfile
+from twitwi.constants import SOURCE_DATETIME_FORMAT_V2
 
 from minet.web import (
     create_request_retryer,
@@ -23,6 +26,8 @@ from minet.bluesky.jwt import parse_jwt_for_expiration
 from minet.bluesky.exceptions import (
     BlueskyAuthenticationError,
     BlueskySessionRefreshError,
+    BlueskyBadRequestError,
+    BlueskyUpstreamFailureError,
 )
 
 
@@ -30,7 +35,9 @@ class BlueskyHTTPClient:
     def __init__(self, identifier: str, password: str):
         self.urls = BlueskyHTTPAPIUrlFormatter()
         self.pool_manager = create_pool_manager()
-        self.retryer = create_request_retryer()
+        self.retryer = create_request_retryer(
+            additional_exceptions=[BlueskyUpstreamFailureError]
+        )
         self.rate_limit_reset: Optional[int] = None
 
         # First auth
@@ -101,6 +108,19 @@ class BlueskyHTTPClient:
             headers=headers,
         )
 
+        if response.status >= 400:
+            data = response.json()
+            if "error" in data:
+                e = data["error"]
+                if e == "UpstreamFailure":
+                    raise BlueskyUpstreamFailureError(
+                        "Bluesky is currently experiencing upstream issues."
+                    )
+                raise BlueskyBadRequestError(
+                    f"HTTP {response.status} {e}: {data['message']}"
+                )
+            raise BlueskyBadRequestError(f"HTTP {response.status}")
+
         remaining = int(response.headers["RateLimit-Remaining"])
 
         if remaining <= 0:
@@ -108,22 +128,117 @@ class BlueskyHTTPClient:
 
         return response
 
-    def search_posts(self, query: str) -> Iterator[BlueskyPost]:
+    def search_posts(
+        self,
+        query: str,
+        lang: Optional[str] = None,
+        since: Optional[str] = None,
+        until: Optional[str] = None,
+        mentions: Optional[str] = None,
+        author: Optional[str] = None,
+        domain: Optional[str] = None,
+        url: Optional[str] = None,
+    ) -> Iterator[BlueskyPost]:
         cursor = None
+        oldest_post_uris: set[str] = set()
+        new_oldest_post_uris: set[str] = set()
+        oldest_post_timestamp_utc = None  # has millisecond precision
+
+        # Search with time seems to work with millisecond precision
+        time_overlap = 1
+
+        # to avoid infinite loop when we find the final post,
+        # as it will always appears in the next request because of the time overlap for paging with time range
+        oldest_date_changed: bool = False
+        oldest_uris_len_changed: bool = False
+        old_len_oldest_post_uris = 0
 
         while True:
-            url = self.urls.search_posts(query, cursor=cursor)
+            request_url = self.urls.search_posts(
+                q=query,
+                cursor=cursor,
+                lang=lang,
+                since=since,
+                until=until,
+                mentions=mentions,
+                author=author,
+                domain=domain,
+                url=url,
+            )
 
-            response = self.request(url)
+            response = self.request(request_url)
             data = response.json()
 
+            if "posts" not in data or len(data["posts"]) == 0:
+                break
+
+            oldest_date_changed = False
+            old_len_oldest_post_uris = len(oldest_post_uris)
+            new_oldest_post_uris.clear()
+
             for post in data["posts"]:
+                # We're using the uri as a unique identifier for posts, as it exists cids that are not unique
+                if post["uri"] in oldest_post_uris:
+                    continue
+
                 # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post)
+
+                # Taking the minimum createdAt time to avoid issues
+                # with posts not being perfectly sorted by createdAt (local_time parameter is createdAt in UTC)
+                # TODO: handle locale timezone wanted by user
+                post_timestamp_utc = get_dates(
+                    post["record"]["createdAt"],
+                    source="bluesky",
+                    millisecond_timestamp=True,
+                )[0]
+                if (
+                    oldest_post_timestamp_utc
+                    and oldest_post_timestamp_utc <= post_timestamp_utc
+                ):
+                    if post_timestamp_utc == oldest_post_timestamp_utc:
+                        # adding posts within the time range of the oldest post to the "already seen uris" list,
+                        # because they will be in the next request because of the little
+                        # (but still existing) time overlap for paging with time range
+                        if not oldest_date_changed:
+                            oldest_post_uris.add(post["uri"])
+                        else:
+                            # Not changing oldest_post_uris yet, as we still need to check all posts in this request,
+                            # in case we (unfortunately and unlikely) encounter an already seen post (in the previous request to the API)
+                            # that is older than the current post date (as said, it's unlikely to happen, but we must handle it anyway)
+                            new_oldest_post_uris.add(post["uri"])
+                    continue
+
+                oldest_date_changed = True
+                new_oldest_post_uris.clear()
+                new_oldest_post_uris.add(post["uri"])
+                oldest_post_timestamp_utc = post_timestamp_utc
+
+            if oldest_date_changed:
+                oldest_post_uris.clear()
+                oldest_post_uris = new_oldest_post_uris.copy()
+                new_oldest_post_uris.clear()
+
+            # We are not changing the oldest_post_uris manually in the loop,
+            # as oldest_post_uris is only changed by adding NEW uris,
+            # and uris already in the set are ignored when added again, i.e. the set isn't changed,
+            # except in the case where the oldest post date changes.
+            oldest_uris_len_changed = len(oldest_post_uris) != old_len_oldest_post_uris
 
             cursor = data.get("cursor")
 
             if cursor is None:
+                # NOTE: the until flag is exclusive
+                oldest_post_timestamp_utc_plus_delta = (
+                    oldest_post_timestamp_utc + time_overlap
+                )
+                until = datetime.fromtimestamp(
+                    oldest_post_timestamp_utc_plus_delta / 1000, tz=timezone.utc
+                ).strftime(SOURCE_DATETIME_FORMAT_V2)
+
+            # If the oldest post date did not change, and no new uris were added to the "already seen uris" list,
+            # it means we have reached the end of the available posts
+            if not oldest_uris_len_changed and not oldest_date_changed:
                 break
 
     def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
