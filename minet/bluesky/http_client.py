@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Iterator, Iterable, Optional, Any, List, Dict
+from typing import Iterator, Iterable, Optional, Any, List, Dict, Union, Tuple
 
 from time import time, sleep
 from ebbe import as_reconciled_chunks
@@ -138,7 +138,8 @@ class BlueskyHTTPClient:
         author: Optional[str] = None,
         domain: Optional[str] = None,
         url: Optional[str] = None,
-    ) -> Iterator[BlueskyPost]:
+        store_errors: bool = False,
+    ) -> Iterator[Union[BlueskyPost, Tuple[str, str]]]:
         cursor = None
         oldest_post_uris: set[str] = set()
         new_oldest_post_uris: set[str] = set()
@@ -181,8 +182,14 @@ class BlueskyHTTPClient:
                 if post["uri"] in oldest_post_uris:
                     continue
 
-                # TODO : handle locale + extract_referenced_posts + collected_via
-                yield normalize_post(post)
+                try:
+                    # TODO : handle locale + extract_referenced_posts + collected_via
+                    yield normalize_post(post)
+                except Exception as e:
+                    if store_errors:
+                        yield (str(e), post)
+                    else:
+                        raise e
 
                 # Taking the minimum createdAt time to avoid issues
                 # with posts not being perfectly sorted by createdAt (local_time parameter is createdAt in UTC)

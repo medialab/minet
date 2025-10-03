@@ -1,6 +1,8 @@
 from casanova import Enricher
 from itertools import islice
 
+import casanova.ndjson as ndjson
+
 from twitwi.bluesky.constants import POST_FIELDS
 from twitwi.bluesky import format_post_as_csv_row
 
@@ -24,6 +26,12 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     cli_args.mentions = cli_args.mentions.lstrip("@") if cli_args.mentions else None
     cli_args.author = cli_args.author.lstrip("@") if cli_args.author else None
+    if cli_args.store_errors:
+        mode = "w" if cli_args.overwrite_errors else "a"
+        errors_file = open(cli_args.store_errors, mode, encoding="utf-8")
+        writer = ndjson.writer(errors_file)
+    else:
+        writer = None
 
     wanted_flags = [
         "lang",
@@ -60,9 +68,14 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     author=cli_args.author,
                     domain=cli_args.domain,
                     url=cli_args.url,
+                    store_errors=writer is not None,
                 ),
                 int(cli_args.limit) if cli_args.limit else None,
             ):
+                if writer is not None and isinstance(post, tuple):
+                    error_message, post_payload = post
+                    writer.writerow({"error": error_message, "post": post_payload})
+                    continue
                 post_row = format_post_as_csv_row(post)
                 enricher.writerow(row, post_row)
                 loading_bar.nested_advance()

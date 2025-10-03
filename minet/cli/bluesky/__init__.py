@@ -64,6 +64,15 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
             "help": "Filter posts with links (facet links or embeds) pointing to this URL. Server may apply URL normalization or fuzzy matching. The only equivalent in classic search syntax could be typing the URL as a keyword.",
         },
         {
+            "flag": "--store-errors",
+            "help": "Store potential errors and associated post raw payloads in the given file (.ndjson). Appends to the file by default. Use the '--overwrite-errors' flag to overwrite the file.",
+        },
+        {
+            "flag": "--overwrite-errors",
+            "action": "store_true",
+            "help": "Overwrite the errors file if it already exists (used with --store-errors).",
+        },
+        {
             "flags": ["-l", "--limit"],
             "type": int,
             "help": "Limit the number of posts to retrieve for each query.",
