@@ -8,6 +8,7 @@ from twitwi.bluesky import format_post_as_csv_row
 
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.loading_bar import LoadingBar
+from minet.cli.console import console
 
 from minet.bluesky import BlueskyHTTPClient
 from minet.cli.bluesky.utils import with_bluesky_fatal_errors
@@ -53,6 +54,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     flags_str: str = "\n".join(flags_list)
 
+    nb_errors = 0
     for row, query in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(
             f"{query}\n{flags_str}" if flags_str else query,
@@ -73,6 +75,12 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                 int(cli_args.limit) if cli_args.limit else None,
             ):
                 if writer is not None and isinstance(post, tuple):
+                    nb_errors += 1
+                    console.print(
+                        f"Total of errors encountered: {nb_errors}",
+                        style="dim",
+                        highlight=True,
+                    )
                     error_message, post_payload = post
                     writer.writerow({"error": error_message, "post": post_payload})
                     continue
