@@ -217,8 +217,8 @@ class BlueskyHTTPClient:
                 continue
             if return_raw:
                 yield post_data
-            # TODO : handle locale + extract_referenced_posts + collected_via
             else:
+                # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post_data)
 
     def get_user_posts(self, did: str) -> Iterator[BlueskyPost]:
@@ -240,8 +240,8 @@ class BlueskyHTTPClient:
                 break
 
     def get_profiles(
-        self, identifiers: Iterable[Optional[str]]
-    ) -> Iterator[BlueskyProfile]:
+        self, identifiers: Iterable[Optional[str]], return_raw=False
+    ) -> Iterator[Union[BlueskyProfile, str]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_profiles(chunk)
             response = self.request(url)
@@ -264,6 +264,8 @@ class BlueskyHTTPClient:
             ):  # in case the profile was not found (e.g. non-existing user)
                 yield None
                 continue
-
-            # TODO: handle locale + collected_via
-            yield normalize_profile(profile_data)
+            if return_raw:
+                yield profile_data
+            else:
+                # TODO: handle locale + collected_via
+                yield normalize_profile(profile_data)

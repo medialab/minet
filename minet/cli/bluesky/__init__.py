@@ -55,6 +55,10 @@ BLUESKY_FOLLOWS_COMMAND = command(
         Tips:
 
         - If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+
+        Note:
+
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
     """,
 )
 
@@ -89,6 +93,10 @@ BLUESKY_FOLLOWERS_COMMAND = command(
         Tips:
 
         - If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+
+        Note:
+
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
     """,
 )
 
@@ -133,7 +141,14 @@ BLUESKY_PROFILES_COMMAND = command(
     description="""
         Get whether a Bluesky profile given the user handle or DID or multiple Bluesky profiles given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
     """,
-    arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
+    arguments=[
+        {
+            "flag": "--raw",
+            "action": "store_true",
+            "help": "Return the raw profile data in JSON as received from the Bluesky API instead of a normalized version.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
     variadic_input={"dummy_column": "handle-or-did"},
     epilog="""
         Examples:
@@ -269,6 +284,10 @@ BLUESKY_SEARCH_PROFILES_COMMAND = command(
 
         . Get users from a CSV file:
             $ minet bluesky search-users <query-column> -i queries.csv
+
+        Note:
+
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
 
     """,
 )
