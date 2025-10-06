@@ -177,7 +177,7 @@ class BlueskyHTTPClient:
             new_oldest_post_uris.clear()
 
             for post in data["posts"]:
-                # We're using the uri as a unique identifier for posts, as it exists cids that are not unique
+                # We're using the uri as a unique identifier for posts, as there exists cids that are not
                 if post["uri"] in oldest_post_uris:
                     continue
 
