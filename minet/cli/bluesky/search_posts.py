@@ -83,6 +83,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     )
                     error_message, post_payload = post
                     writer.writerow({"error": error_message, "post": post_payload})
+                    errors_file.flush()
                     continue
                 post_row = format_post_as_csv_row(post)
                 enricher.writerow(row, post_row)
