@@ -17,6 +17,8 @@ from minet.web import (
     Response,
 )
 
+from minet.cli.console import console
+
 from minet.bluesky.urls import (
     BlueskyHTTPAPIUrlFormatter,
     parse_post_url,
@@ -171,7 +173,18 @@ class BlueskyHTTPClient:
             data = response.json()
 
             if "posts" not in data or len(data["posts"]) == 0:
-                break
+                console.print(
+                    f"There is no post anymore in 'data'. Retrying one time just in case...\n====DATA====\n{data}\n============",
+                    highlight=True,
+                    style="dim",
+                )
+                response = self.request(request_url)
+                data = response.json()
+                if "posts" not in data or len(data["posts"]) == 0:
+                    console.print(
+                        "There is still no post in 'data'. Stopping.", style="dim"
+                    )
+                    break
 
             oldest_date_changed = False
             old_len_oldest_post_uris = len(oldest_post_uris)
@@ -199,6 +212,7 @@ class BlueskyHTTPClient:
                     source="bluesky",
                     millisecond_timestamp=True,
                 )[0]
+
                 if (
                     oldest_post_timestamp_utc
                     and oldest_post_timestamp_utc <= post_timestamp_utc
@@ -216,6 +230,7 @@ class BlueskyHTTPClient:
                             new_oldest_post_uris.add(post["uri"])
                     continue
 
+                # We have a new oldest post date
                 oldest_date_changed = True
                 new_oldest_post_uris.clear()
                 new_oldest_post_uris.add(post["uri"])
@@ -246,6 +261,10 @@ class BlueskyHTTPClient:
             # If the oldest post date did not change, and no new uris were added to the "already seen uris" list,
             # it means we have reached the end of the available posts
             if not oldest_uris_len_changed and not oldest_date_changed:
+                console.print(
+                    "The oldest post date did not change, and no new uris were added to the 'already seen uris' list. Stopping.",
+                    style="dim",
+                )
                 break
 
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
