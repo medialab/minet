@@ -274,7 +274,10 @@ class BlueskyHTTPClient:
 
     def resolve_post_url(self, url: str) -> str:
         handle, rkey = parse_post_url(url)
-        did = self.resolve_handle(handle)
+        if handle.startswith("did:"):
+            did = handle
+        else:
+            did = self.resolve_handle(handle)
 
         return format_post_at_uri(did, rkey)
 
