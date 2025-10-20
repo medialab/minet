@@ -254,9 +254,20 @@ class BlueskyHTTPClient:
                 oldest_post_timestamp_utc_plus_delta = (
                     oldest_post_timestamp_utc + time_overlap
                 )
+                if oldest_post_timestamp_utc < -62135597361000:  # before year 0001
+                    oldest_post_timestamp_utc_plus_delta += 31536000000  # add one year (0001 is not a leap year) in milliseconds
+
                 until = datetime.fromtimestamp(
                     oldest_post_timestamp_utc_plus_delta / 1000, tz=timezone.utc
                 ).strftime(SOURCE_DATETIME_FORMAT_V2)
+
+                # Handle year 0 case
+                if oldest_post_timestamp_utc < -62135597361000:  # before year 0001
+                    until = "0" + until[1:]
+
+                # Handling years with less than 4 digits
+                while "-" in until[0:4]:
+                    until = "0" + until
 
             # If the oldest post date did not change, and no new uris were added to the "already seen uris" list,
             # it means we have reached the end of the available posts
