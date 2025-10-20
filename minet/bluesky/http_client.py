@@ -204,14 +204,21 @@ class BlueskyHTTPClient:
                     else:
                         raise e
 
-                # Taking the minimum createdAt time to avoid issues
+                # Taking the minimum sortAt time to avoid issues
                 # with posts not being perfectly sorted by createdAt (local_time parameter is createdAt in UTC)
                 # TODO: handle locale timezone wanted by user
-                post_timestamp_utc = get_dates(
-                    post["record"]["createdAt"],
-                    source="bluesky",
-                    millisecond_timestamp=True,
-                )[0]
+                post_timestamp_utc = min(
+                    get_dates(
+                        post["record"]["createdAt"],
+                        source="bluesky",
+                        millisecond_timestamp=True,
+                    )[0],
+                    get_dates(
+                        post["indexedAt"],
+                        source="bluesky",
+                        millisecond_timestamp=True,
+                    )[0],
+                )
 
                 if (
                     oldest_post_timestamp_utc
