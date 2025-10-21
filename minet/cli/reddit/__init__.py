@@ -79,8 +79,8 @@ REDDIT_USER_POSTS_SUBCOMMAND = command(
     epilog="""
         Example:
 
-        . Searching posts from the user page of u/random_user:
-            $ minet reddit user-posts https://www.reddit.com/user/random_user/submitted/ > random_user_posts.csv
+        . Searching posts from the user page of u/reddit:
+            $ minet reddit user-posts https://www.reddit.com/user/reddit/submitted/ > reddit_posts.csv
     """,
     variadic_input={
         "dummy_column": "user",
@@ -111,8 +111,8 @@ REDDIT_USER_COMMENTS_SUBCOMMAND = command(
     epilog="""
         Example:
 
-        . Searching comments from the user page of u/random_user:
-            $ minet reddit user-comments https://www.reddit.com/user/random_user/comments/ > random_user_comments.csv
+        . Searching comments from the user page of u/reddit:
+            $ minet reddit user-comments https://www.reddit.com/user/reddit/comments/ > reddit_comments.csv
     """,
     variadic_input={
         "dummy_column": "user",

@@ -56,7 +56,7 @@ _Platform-related commands_
   - [comments](#comments-1)
   - [posts](#posts)
   - [user-comments](#user-comments)
-  - [user-posrs](#user-posts-1)
+  - [user-posts](#user-posts-1)
 - [telegram (tl)](#telegram)
   - [channel-infos](#channel-infos)
   - [channel-messages](#channel-messages)
