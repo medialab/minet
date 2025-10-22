@@ -58,7 +58,7 @@ post_urls = [
       "https://bsky.app/profile/NewYork.activitypub.awakari.com.ap.brid.gy/post/3lkctsyce5f42"
 ]
 
-did_at_uris = [client.post_url_to_did_at_uri(post_url) for post_url in post_urls]
+did_at_uris = [client.resolve_post_url(post_url) for post_url in post_urls]
 
 DATA = []
 

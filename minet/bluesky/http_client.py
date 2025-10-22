@@ -1,12 +1,12 @@
-from datetime import datetime, timezone
-from typing import Iterator, Iterable, Optional, Any, List, Dict
+from typing import Iterator, Iterable, Optional, Any, List, Dict, Union
 
 from time import time, sleep
+from datetime import datetime, timezone
 from ebbe import as_reconciled_chunks
 
 from twitwi.utils import get_dates
-from twitwi.bluesky import normalize_profile, normalize_post
-from twitwi.bluesky.types import BlueskyPost, BlueskyProfile
+from twitwi.bluesky import normalize_profile, normalize_post, normalize_partial_profile
+from twitwi.bluesky.types import BlueskyPost, BlueskyProfile, BlueskyPartialProfile
 from twitwi.constants import SOURCE_DATETIME_FORMAT_V2
 
 from minet.web import (
@@ -28,6 +28,7 @@ from minet.bluesky.exceptions import (
     BlueskySessionRefreshError,
     BlueskyBadRequestError,
     BlueskyUpstreamFailureError,
+    BlueskyHandleNotFound,
 )
 
 
@@ -177,7 +178,7 @@ class BlueskyHTTPClient:
             new_oldest_post_uris.clear()
 
             for post in data["posts"]:
-                # We're using the uri as a unique identifier for posts, as it exists cids that are not unique
+                # We're using the uri as a unique identifier for posts, as there exists cids that are not
                 if post["uri"] in oldest_post_uris:
                     continue
 
@@ -192,6 +193,7 @@ class BlueskyHTTPClient:
                     source="bluesky",
                     millisecond_timestamp=True,
                 )[0]
+
                 if (
                     oldest_post_timestamp_utc
                     and oldest_post_timestamp_utc <= post_timestamp_utc
@@ -241,29 +243,85 @@ class BlueskyHTTPClient:
             if not oldest_uris_len_changed and not oldest_date_changed:
                 break
 
+    def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+        while True:
+            url = self.urls.search_profiles(query, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["actors"]:
+                yield normalize_partial_profile(profile)
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
+
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
+        identifier = identifier.lstrip("@")
+
         url = self.urls.resolve_handle(identifier, _alternate_api=_alternate_api)
 
         response = self.request(url)
         data = response.json()
+
         try:
             return data["did"]
-        except KeyError as e:
+        except KeyError:
             if not _alternate_api:
                 return self.resolve_handle(identifier, _alternate_api=True)
             else:
-                raise e
+                raise BlueskyHandleNotFound(identifier)
 
-    def post_url_to_did_at_uri(self, url: str) -> str:
+    def resolve_post_url(self, url: str) -> str:
         handle, rkey = parse_post_url(url)
-        did = self.resolve_handle(handle)
+        if handle.startswith("did:"):
+            did = handle
+        else:
+            did = self.resolve_handle(handle)
 
         return format_post_at_uri(did, rkey)
+
+    def get_follows(self, did: str) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        while True:
+            url = self.urls.get_follows(did, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["follows"]:
+                yield normalize_partial_profile(profile)
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
+
+    def get_followers(self, did: str) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        while True:
+            url = self.urls.get_followers(did, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["followers"]:
+                yield normalize_partial_profile(profile)
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
 
     # NOTE: this API route does not return any results for at-uris containing handles!
     def get_posts(
         self, did_at_uris: Iterable[str], return_raw=False
-    ) -> Iterator[BlueskyPost]:
+    ) -> Iterator[Optional[Union[BlueskyPost, Dict]]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_posts(chunk)
             response = self.request(url)
@@ -275,23 +333,18 @@ class BlueskyHTTPClient:
             return data.get(uri)
 
         for _, post_data in as_reconciled_chunks(25, did_at_uris, work, reconcile):
-            if return_raw:
+            if not post_data:
+                # in case the post was not found (e.g. non-existing post)
+                yield None
+            elif return_raw:
                 yield post_data
-            # TODO : handle locale + extract_referenced_posts + collected_via
             else:
+                # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post_data)
 
-    def get_user_posts(
-        self, identifier: str, limit: Optional[int] = -1
-    ) -> Iterator[BlueskyPost]:
-        if not identifier.startswith("did:"):
-            did = self.resolve_handle(identifier)
-        else:
-            did = identifier
-
+    def get_user_posts(self, did: str) -> Iterator[BlueskyPost]:
         cursor = None
 
-        count = 0
         while True:
             url = self.urls.get_user_posts(did, cursor=cursor)
 
@@ -301,16 +354,16 @@ class BlueskyHTTPClient:
             for post in data["feed"]:
                 # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post)
-                count += 1
-                if count == limit:
-                    break
 
             cursor = data.get("cursor")
 
-            if cursor is None or count == limit:
+            if cursor is None:
                 break
 
-    def get_profiles(self, identifiers: Iterable[str]) -> Iterator[BlueskyProfile]:
+    # NOTE: does this need to accept Optional[str]?
+    def get_profiles(
+        self, identifiers: Iterable[Optional[str]], return_raw=False
+    ) -> Iterator[Optional[Union[BlueskyProfile, Dict]]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_profiles(chunk)
             response = self.request(url)
@@ -328,5 +381,11 @@ class BlueskyHTTPClient:
             return data.get(identifier)
 
         for _, profile_data in as_reconciled_chunks(25, identifiers, work, reconcile):
-            # TODO: handle locale + collected_via
-            yield normalize_profile(profile_data)
+            if not profile_data:
+                # In case the profile was not found (e.g. non-existing user)
+                yield None
+            elif return_raw:
+                yield profile_data
+            else:
+                # TODO: handle locale + collected_via
+                yield normalize_profile(profile_data)
