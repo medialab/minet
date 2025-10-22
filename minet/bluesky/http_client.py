@@ -28,6 +28,7 @@ from minet.bluesky.exceptions import (
     BlueskySessionRefreshError,
     BlueskyBadRequestError,
     BlueskyUpstreamFailureError,
+    BlueskyHandleNotFound,
 )
 
 
@@ -192,6 +193,7 @@ class BlueskyHTTPClient:
                     source="bluesky",
                     millisecond_timestamp=True,
                 )[0]
+
                 if (
                     oldest_post_timestamp_utc
                     and oldest_post_timestamp_utc <= post_timestamp_utc
@@ -264,13 +266,14 @@ class BlueskyHTTPClient:
 
         response = self.request(url)
         data = response.json()
+
         try:
             return data["did"]
-        except KeyError as e:
+        except KeyError:
             if not _alternate_api:
                 return self.resolve_handle(identifier, _alternate_api=True)
             else:
-                raise e
+                raise BlueskyHandleNotFound(identifier)
 
     def resolve_post_url(self, url: str) -> str:
         handle, rkey = parse_post_url(url)
@@ -318,7 +321,7 @@ class BlueskyHTTPClient:
     # NOTE: this API route does not return any results for at-uris containing handles!
     def get_posts(
         self, did_at_uris: Iterable[str], return_raw=False
-    ) -> Iterator[Union[BlueskyPost, str, Any]]:
+    ) -> Iterator[Optional[Union[BlueskyPost, Dict]]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_posts(chunk)
             response = self.request(url)
@@ -330,10 +333,10 @@ class BlueskyHTTPClient:
             return data.get(uri)
 
         for _, post_data in as_reconciled_chunks(25, did_at_uris, work, reconcile):
-            if not post_data:  # in case the post was not found (e.g. non-existing post)
+            if not post_data:
+                # in case the post was not found (e.g. non-existing post)
                 yield None
-                continue
-            if return_raw:
+            elif return_raw:
                 yield post_data
             else:
                 # TODO : handle locale + extract_referenced_posts + collected_via
@@ -357,9 +360,10 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
+    # NOTE: does this need to accept Optional[str]?
     def get_profiles(
         self, identifiers: Iterable[Optional[str]], return_raw=False
-    ) -> Iterator[Union[BlueskyProfile, str]]:
+    ) -> Iterator[Optional[Union[BlueskyProfile, Dict]]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_profiles(chunk)
             response = self.request(url)
@@ -377,12 +381,10 @@ class BlueskyHTTPClient:
             return data.get(identifier)
 
         for _, profile_data in as_reconciled_chunks(25, identifiers, work, reconcile):
-            if (
-                not profile_data
-            ):  # in case the profile was not found (e.g. non-existing user)
+            if not profile_data:
+                # In case the profile was not found (e.g. non-existing user)
                 yield None
-                continue
-            if return_raw:
+            elif return_raw:
                 yield profile_data
             else:
                 # TODO: handle locale + collected_via

@@ -19,3 +19,7 @@ class BlueskyBadRequestError(BlueskyError):
 
 class BlueskyUpstreamFailureError(BlueskyError):
     pass
+
+
+class BlueskyHandleNotFound(BlueskyError):
+    pass

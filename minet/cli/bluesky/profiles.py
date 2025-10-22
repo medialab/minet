@@ -17,6 +17,7 @@ from minet.cli.loading_bar import LoadingBar
 from minet.cli.bluesky.utils import with_bluesky_fatal_errors
 
 from minet.bluesky import BlueskyHTTPClient
+from minet.bluesky.exceptions import BlueskyHandleNotFound
 
 
 @with_bluesky_fatal_errors
@@ -35,7 +36,8 @@ def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
             else:
                 try:
                     yield client.resolve_handle(user, True)
-                except KeyError:  # in case the user does not exist
+                except BlueskyHandleNotFound:
+                    # in case the user does not exist
                     yield None
                 except Exception as e:
                     raise e
