@@ -234,9 +234,15 @@ class BlueskyHTTPClient:
                 oldest_post_timestamp_utc_plus_delta = (
                     oldest_post_timestamp_utc + time_overlap
                 )
-                until = datetime.fromtimestamp(
-                    oldest_post_timestamp_utc_plus_delta / 1000, tz=timezone.utc
-                ).strftime(SOURCE_DATETIME_FORMAT_V2)
+
+                try:
+                    until = datetime.fromtimestamp(
+                        oldest_post_timestamp_utc_plus_delta / 1000, tz=timezone.utc
+                    ).strftime(SOURCE_DATETIME_FORMAT_V2)
+                except ValueError as e:
+                    # Get your shit together Bluesky...
+                    if "out of range" in str(e).lower():
+                        break
 
             # If the oldest post date did not change, and no new uris were added to the "already seen uris" list,
             # it means we have reached the end of the available posts
