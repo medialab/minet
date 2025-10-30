@@ -265,9 +265,14 @@ class BlueskyHTTPClient:
                     if "out of range" in str(e).lower():
                         break
 
-            # If the oldest post date did not change, and no new uris were added to the "already seen uris" list,
+            # If the oldest post date did not change, no new uris were added to the "already seen uris" list,
+            # and if we reached the number of posts already seen with this date
             # it means we have reached the end of the available posts
-            if not oldest_uris_len_changed and not oldest_date_changed:
+            elif (
+                not oldest_uris_len_changed
+                and not oldest_date_changed
+                and len(oldest_post_uris) <= cursor
+            ):
                 console.print(
                     "The oldest post date did not change, and no new uris were added to the 'already seen uris' list. Stopping.",
                     style="dim",
