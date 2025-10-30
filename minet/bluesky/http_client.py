@@ -157,6 +157,8 @@ class BlueskyHTTPClient:
         oldest_uris_len_changed: bool = False
         old_len_oldest_post_uris = 0
 
+        old_cursor = None
+
         while True:
             request_url = self.urls.search_posts(
                 q=query,
@@ -266,18 +268,24 @@ class BlueskyHTTPClient:
                         break
 
             # If the oldest post date did not change, no new uris were added to the "already seen uris" list,
-            # and if we reached the number of posts already seen with this date
+            # and the cursor didn't advance further
             # it means we have reached the end of the available posts
-            elif (
+            if (
                 not oldest_uris_len_changed
                 and not oldest_date_changed
-                and len(oldest_post_uris) <= cursor
+                and cursor == old_cursor
             ):
                 console.print(
                     "The oldest post date did not change, and no new uris were added to the 'already seen uris' list. Stopping.",
-                    style="dim",
+                    style="yellow",
                 )
                 break
+
+            # If we added new uris (either with the same oldest post date or a new one, then we're seeing new posts)
+            # The only cases we don't update the old_cursor is when we are seeing the same posts again,
+            # at the beginning of a new time range page
+            if oldest_uris_len_changed:
+                old_cursor = cursor
 
     def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
