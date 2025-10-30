@@ -39,7 +39,7 @@ class BlueskyHTTPClient:
         self.urls = BlueskyHTTPAPIUrlFormatter()
         self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer(
-            additional_exceptions=[BlueskyUpstreamFailureError]
+            additional_exceptions=[BlueskyUpstreamFailureError], retry_on_statuses=[502]
         )
         self.rate_limit_reset: Optional[int] = None
 
