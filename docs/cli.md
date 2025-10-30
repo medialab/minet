@@ -26,7 +26,16 @@ _Generic commands_
 _Platform-related commands_
 
 - [bluesky (bsky)](#bluesky)
+  - [follows](#follows)
+  - [followers](#followers)
+  - [posts](#posts)
+  - [profiles](#profiles)
+  - [user-posts](#user-posts)
+  - [resolve-post-url](#resolve-post-url)
+  - [resolve-handle](#resolve-handle)
   - [search-posts](#search-posts)
+  - [search-users](#search-users)
+
 - [facebook (fb)](#facebook)
   - [url-likes](#url-likes)
 - [google](#google)
@@ -66,7 +75,7 @@ _Platform-related commands_
   - [search-videos](#search-videos)
 - [twitter](#twitter)
   - [attrition](#attrition)
-  - [followers](#followers)
+  - [followers](#followers-1)
   - [followers-you-know](#followers-you-know)
   - [friends](#friends)
   - [list-followers](#list-followers)
@@ -1797,35 +1806,999 @@ how to use the command with a CSV file?
 ## Bluesky
 
 ```
-Usage: minet bluesky [-h] {firehose,search-posts} ...
+Usage: minet bluesky [-h]
+                     {firehose,follows,followers,posts,profiles,user-posts,resolve-post-url,resolve-handle,search-posts,search-users}
+                     ...
 
 # Minet Bluesky Command
 
 Collect data from Bluesky.
 
 Optional Arguments:
-  -h, --help               show this help message and exit
+  -h, --help                    show this help message and exit
 
 Subcommands:
-  {firehose,search-posts}  Subcommand to use.
-    firehose               Minet Bluesky Firehose Command
-    search-posts           Minet Bluesky Search Post Command
+  {firehose,follows,followers,posts,profiles,user-posts,resolve-post-url,resolve-handle,search-posts,search-users}
+                                Subcommand to use.
+    firehose                    Minet Bluesky Firehose Command
+    follows                     Minet Bluesky Get Follows From Handle Or DID
+                                Command
+    followers                   Minet Bluesky Get Followers From Handle Or DID
+                                Command
+    posts                       Minet Bluesky Get Post From URI or URL Command
+    profiles                    Minet Bluesky Get Profile From Handle Or DID
+                                Command
+    user-posts                  Minet Bluesky Get User Posts Command
+    resolve-post-url            Minet Bluesky resolve URL to URI Command
+    resolve-handle              Minet Bluesky Resolve Handle Command
+    search-posts                Minet Bluesky Search Post Command
+    search-users                Minet Bluesky Search Users Command
+```
+
+### follows
+
+```
+Usage: minet bluesky follows [-h] [-l LIMIT] [--silent]
+                             [--refresh-per-second REFRESH_PER_SECOND]
+                             [--simple-progress] [--identifier IDENTIFIER]
+                             [--rcfile RCFILE] [--password PASSWORD] [-i INPUT]
+                             [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                             [-o OUTPUT]
+                             handle-or-did_or_handle-or-did_column
+
+# Minet Bluesky Get Follows From Handle Or DID Command
+
+Get whether follows of a user giving its handle or DID or respective follows of several users given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
+
+Positional Arguments:
+  handle-or-did_or_handle-or-did_column
+                                Single handle-or-did to process or name of the
+                                CSV column containing handle-or-dids when using
+                                -i/--input.
+
+Optional Arguments:
+  --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
+                                `.bsky.social` at the end). Can also be
+                                configured in a .minetrc file as
+                                "bluesky.identifier" or read from the
+                                MINET_BLUESKY_IDENTIFIER env variable.
+  -l, --limit LIMIT             Limit the number of follows to retrieve for each
+                                user. Will collect all follows by default.
+  --password PASSWORD           Bluesky app password (not your personal
+                                password, must be created here:
+                                https://bsky.app/settings/app-passwords). Can
+                                also be configured in a .minetrc file as
+                                "bluesky.password" or read from the
+                                MINET_BLUESKY_PASSWORD env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the handle-or-dids you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Get follows of a user by their handle:
+    $ minet bluesky follows @bsky.app
+
+. Get 100 follows of a user by their DID:
+    $ minet bluesky follows did:plc:z72i7hdynmk6r22z27h6tvur --limit 100
+
+. Get follows from users by their handles from a CSV file:
+    $ minet bluesky follows <handle-column> -i users.csv
+
+Tips:
+
+- If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+
+Note:
+
+- This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet bluesky follows "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet bluesky follows column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet bluesky follows column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet bluesky follows column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet bluesky follows "value1,value2" --explode ","
+```
+
+### followers
+
+```
+Usage: minet bluesky followers [-h] [-l LIMIT] [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND]
+                               [--simple-progress] [--identifier IDENTIFIER]
+                               [--rcfile RCFILE] [--password PASSWORD]
+                               [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                               [--total TOTAL] [-o OUTPUT]
+                               handle-or-did_or_handle-or-did_column
+
+# Minet Bluesky Get Followers From Handle Or DID Command
+
+Get whether followers of a user giving its handle or DID or respective followers of several users given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
+
+Positional Arguments:
+  handle-or-did_or_handle-or-did_column
+                                Single handle-or-did to process or name of the
+                                CSV column containing handle-or-dids when using
+                                -i/--input.
+
+Optional Arguments:
+  --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
+                                `.bsky.social` at the end). Can also be
+                                configured in a .minetrc file as
+                                "bluesky.identifier" or read from the
+                                MINET_BLUESKY_IDENTIFIER env variable.
+  -l, --limit LIMIT             Limit the number of followers to retrieve for
+                                each user. Will collect all followers by
+                                default.
+  --password PASSWORD           Bluesky app password (not your personal
+                                password, must be created here:
+                                https://bsky.app/settings/app-passwords). Can
+                                also be configured in a .minetrc file as
+                                "bluesky.password" or read from the
+                                MINET_BLUESKY_PASSWORD env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the handle-or-dids you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Get followers of a user by their handle:
+    $ minet bluesky followers @bsky.app
+
+. Get 100 followers of a user by their DID:
+    $ minet bluesky followers did:plc:z72i7hdynmk6r22z27h6tvur --limit 100
+
+. Get followers from users by their handles from a CSV file:
+    $ minet bluesky followers <handle-column> -i users.csv
+
+Tips:
+
+- If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+
+Note:
+
+- This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet bluesky followers "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet bluesky followers column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet bluesky followers column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet bluesky followers column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet bluesky followers "value1,value2" --explode ","
+```
+
+### posts
+
+```
+Usage: minet bluesky posts [-h] [--raw] [--silent]
+                           [--refresh-per-second REFRESH_PER_SECOND]
+                           [--simple-progress] [--identifier IDENTIFIER]
+                           [--rcfile RCFILE] [--password PASSWORD] [-i INPUT]
+                           [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                           [-o OUTPUT]
+                           uri-or-url_or_uri-or-url_column
+
+# Minet Bluesky Get Post From URI or URL Command
+
+Get whether a Bluesky post given its URI or URL or multiple Bluesky posts given their URIs or URLs from the column of a CSV file. This command uses the Bluesky HTTP API.
+
+Positional Arguments:
+  uri-or-url_or_uri-or-url_column
+                                Single uri-or-url to process or name of the CSV
+                                column containing uri-or-urls when using
+                                -i/--input.
+
+Optional Arguments:
+  --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
+                                `.bsky.social` at the end). Can also be
+                                configured in a .minetrc file as
+                                "bluesky.identifier" or read from the
+                                MINET_BLUESKY_IDENTIFIER env variable.
+  --password PASSWORD           Bluesky app password (not your personal
+                                password, must be created here:
+                                https://bsky.app/settings/app-passwords). Can
+                                also be configured in a .minetrc file as
+                                "bluesky.password" or read from the
+                                MINET_BLUESKY_PASSWORD env variable.
+  --raw                         Return the raw post data in JSON as received
+                                from the Bluesky API instead of a normalized
+                                version.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the uri-or-urls you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Get a post from its URI:
+    $ minet bluesky posts <uri>
+
+. Get a post from its URL:
+    $ minet bluesky posts <url>
+
+. Get multiple posts from their URIs from a CSV file:
+    $ minet bluesky posts <uri-column> -i posts.csv
+
+Tips:
+
+- You can pass either Bluesky post URIs (at://did:...) or full URLs (https://bsky.app/profile/...) and Minet will handle the conversion for you.
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet bluesky posts "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet bluesky posts column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet bluesky posts column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet bluesky posts column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet bluesky posts "value1,value2" --explode ","
+```
+
+### profiles
+
+```
+Usage: minet bluesky profiles [-h] [--raw] [--silent]
+                              [--refresh-per-second REFRESH_PER_SECOND]
+                              [--simple-progress] [--identifier IDENTIFIER]
+                              [--rcfile RCFILE] [--password PASSWORD] [-i INPUT]
+                              [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                              [-o OUTPUT]
+                              handle-or-did_or_handle-or-did_column
+
+# Minet Bluesky Get Profile From Handle Or DID Command
+
+Get whether a Bluesky profile given the user handle or DID or multiple Bluesky profiles given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
+
+Positional Arguments:
+  handle-or-did_or_handle-or-did_column
+                                Single handle-or-did to process or name of the
+                                CSV column containing handle-or-dids when using
+                                -i/--input.
+
+Optional Arguments:
+  --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
+                                `.bsky.social` at the end). Can also be
+                                configured in a .minetrc file as
+                                "bluesky.identifier" or read from the
+                                MINET_BLUESKY_IDENTIFIER env variable.
+  --password PASSWORD           Bluesky app password (not your personal
+                                password, must be created here:
+                                https://bsky.app/settings/app-passwords). Can
+                                also be configured in a .minetrc file as
+                                "bluesky.password" or read from the
+                                MINET_BLUESKY_PASSWORD env variable.
+  --raw                         Return the raw profile data in JSON as received
+                                from the Bluesky API instead of a normalized
+                                version.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the handle-or-dids you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Get profile from a user by their handle:
+    $ minet bluesky profiles @bsky.app
+
+. Get profile from a user by their DID:
+    $ minet bluesky profiles did:plc:z72i7hdynmk6r22z27h6tvur
+
+. Get profiles from users by their handles from a CSV file:
+    $ minet bluesky profiles <handle-column> -i users.csv
+
+Tips:
+
+- If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet bluesky profiles "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet bluesky profiles column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet bluesky profiles column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet bluesky profiles column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet bluesky profiles "value1,value2" --explode ","
+```
+
+### user-posts
+
+```
+Usage: minet bluesky user-posts [-h] [-l LIMIT] [--silent]
+                                [--refresh-per-second REFRESH_PER_SECOND]
+                                [--simple-progress] [--identifier IDENTIFIER]
+                                [--rcfile RCFILE] [--password PASSWORD]
+                                [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                [--total TOTAL] [-o OUTPUT]
+                                handle-or-did_or_handle-or-did_column
+
+# Minet Bluesky Get User Posts Command
+
+Retrieves Bluesky posts whether by user using its handle (e.g. @bsky.app) or DID (did:...) or multiple users given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
+
+Positional Arguments:
+  handle-or-did_or_handle-or-did_column
+                                Single handle-or-did to process or name of the
+                                CSV column containing handle-or-dids when using
+                                -i/--input.
+
+Optional Arguments:
+  --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
+                                `.bsky.social` at the end). Can also be
+                                configured in a .minetrc file as
+                                "bluesky.identifier" or read from the
+                                MINET_BLUESKY_IDENTIFIER env variable.
+  -l, --limit LIMIT             Limit the number of posts to retrieve for each
+                                user. Will collect all posts by default.
+  --password PASSWORD           Bluesky app password (not your personal
+                                password, must be created here:
+                                https://bsky.app/settings/app-passwords). Can
+                                also be configured in a .minetrc file as
+                                "bluesky.password" or read from the
+                                MINET_BLUESKY_PASSWORD env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the handle-or-dids you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Get posts from a user by their handle:
+    $ minet bluesky user-posts @bsky.app
+
+. Get 150 last posts from a user by their DID:
+    $ minet bluesky user-posts did:plc:z72i7hdynmk6r22z27h6tvur --limit 150
+
+. Get posts from users by their handles from a CSV file:
+    $ minet bluesky user-posts <handle-column> -i users.csv
+
+Tips:
+
+- If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet bluesky user-posts "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet bluesky user-posts column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet bluesky user-posts column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet bluesky user-posts column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet bluesky user-posts "value1,value2" --explode ","
+```
+
+### resolve-post-url
+
+```
+Usage: minet bluesky resolve-post-url [-h] [--identifier IDENTIFIER]
+                                      [--rcfile RCFILE] [--silent]
+                                      [--refresh-per-second REFRESH_PER_SECOND]
+                                      [--simple-progress] [--password PASSWORD]
+                                      [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                      [--total TOTAL] [-o OUTPUT]
+                                      url_or_url_column
+
+# Minet Bluesky resolve URL to URI Command
+
+Resolve whether a Bluesky post URL to its URI or multiple Bluesky post URLs to their URIs from column of a CSV file. This command does not use the Bluesky HTTP API.
+
+Positional Arguments:
+  url_or_url_column             Single url to process or name of the CSV column
+                                containing urls when using -i/--input.
+
+Optional Arguments:
+  --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
+                                `.bsky.social` at the end). Can also be
+                                configured in a .minetrc file as
+                                "bluesky.identifier" or read from the
+                                MINET_BLUESKY_IDENTIFIER env variable.
+  --password PASSWORD           Bluesky app password (not your personal
+                                password, must be created here:
+                                https://bsky.app/settings/app-passwords). Can
+                                also be configured in a .minetrc file as
+                                "bluesky.password" or read from the
+                                MINET_BLUESKY_PASSWORD env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the urls you want to process. Will consider `-`
+                                as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Get a post URI from its URL:
+    $ minet bluesky resolve-post-url <url>
+
+. Get multiple post URIs from their URLs from a CSV file:
+    $ minet bluesky resolve-post-url <url-column> -i posts.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet bluesky resolve-post-url "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet bluesky resolve-post-url column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet bluesky resolve-post-url column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet bluesky resolve-post-url column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet bluesky resolve-post-url "value1,value2" --explode ","
+```
+
+### resolve-handle
+
+```
+Usage: minet bluesky resolve-handle [-h] [--identifier IDENTIFIER]
+                                    [--rcfile RCFILE] [--silent]
+                                    [--refresh-per-second REFRESH_PER_SECOND]
+                                    [--simple-progress] [--password PASSWORD]
+                                    [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                    [--total TOTAL] [-o OUTPUT]
+                                    handle_or_handle_column
+
+# Minet Bluesky Resolve Handle Command
+
+Resolve whether a Bluesky handle to its DID or multiple Bluesky handles to their DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
+
+Positional Arguments:
+  handle_or_handle_column       Single handle to process or name of the CSV
+                                column containing handles when using -i/--input.
+
+Optional Arguments:
+  --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
+                                `.bsky.social` at the end). Can also be
+                                configured in a .minetrc file as
+                                "bluesky.identifier" or read from the
+                                MINET_BLUESKY_IDENTIFIER env variable.
+  --password PASSWORD           Bluesky app password (not your personal
+                                password, must be created here:
+                                https://bsky.app/settings/app-passwords). Can
+                                also be configured in a .minetrc file as
+                                "bluesky.password" or read from the
+                                MINET_BLUESKY_PASSWORD env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the handles you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Get a user DID from their handle:
+    $ minet bluesky resolve-handle @bsky.app
+
+. Get multiple user DIDs from their handles from a CSV file:
+    $ minet bluesky resolve-handle <handle-column> -i users.csv
+
+Tips:
+
+- You can pass the handle with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet bluesky resolve-handle "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet bluesky resolve-handle column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet bluesky resolve-handle column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet bluesky resolve-handle column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet bluesky resolve-handle "value1,value2" --explode ","
 ```
 
 ### search-posts
 
 ```
-Usage: minet bluesky search-posts [-h] [--identifier IDENTIFIER]
-                                  [--rcfile RCFILE] [--silent]
+Usage: minet bluesky search-posts [-h] [--lang LANG] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--simple-progress] [--password PASSWORD]
-                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                  [--simple-progress] [--since SINCE]
+                                  [--until UNTIL] [--mentions MENTIONS]
+                                  [--author AUTHOR] [--domain DOMAIN]
+                                  [--url URL] [-l LIMIT]
+                                  [--identifier IDENTIFIER] [--rcfile RCFILE]
+                                  [--password PASSWORD] [-i INPUT]
+                                  [--explode EXPLODE] [-s SELECT]
                                   [--total TOTAL] [-o OUTPUT]
                                   query_or_query_column
 
 # Minet Bluesky Search Post Command
 
-Search for Bluesky posts using their HTTP API.
+Search for whether Bluesky posts matching a query or multiple Bluesky posts matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API.
+
+Positional Arguments:
+  query_or_query_column         Single query to process or name of the CSV
+                                column containing querys when using -i/--input.
+
+Optional Arguments:
+  --author AUTHOR               Filter posts by the given account (with or
+                                without the @). Handles are resolved to DID
+                                before query-time. Equivalent to
+                                "from:<account>" in classic search syntax.
+  --domain DOMAIN               Filter posts with URLs (facet links or embeds)
+                                linking to the given domain (hostname). Server
+                                may apply hostname normalization. Equivalent to
+                                "domain:<domain>" in classic search syntax.
+  --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
+                                `.bsky.social` at the end). Can also be
+                                configured in a .minetrc file as
+                                "bluesky.identifier" or read from the
+                                MINET_BLUESKY_IDENTIFIER env variable.
+  --lang LANG                   Filter posts in the given language. Expected to
+                                be based on post language field, though server
+                                may override language detection. Equivalent to
+                                "lang:<lang>" in classic search syntax.
+  -l, --limit LIMIT             Limit the number of posts to retrieve for each
+                                query.
+  --mentions MENTIONS           Filter posts which mention the given account
+                                (with or without the @). Handles are resolved to
+                                DID before query-time. Only matches rich-text
+                                facet mentions. Equivalent to
+                                "mentions:<account>" in classic search syntax.
+  --password PASSWORD           Bluesky app password (not your personal
+                                password, must be created here:
+                                https://bsky.app/settings/app-passwords). Can
+                                also be configured in a .minetrc file as
+                                "bluesky.password" or read from the
+                                MINET_BLUESKY_PASSWORD env variable.
+  --since SINCE                 Filter results for posts after the indicated
+                                datetime (inclusive). Expected to use
+                                'createdAt' timestamp, with a millisecond
+                                precision. Can be a datetime, or just an ISO
+                                date (YYYY-MM-DD, YYYY-MM-DDTHH, ...,
+                                YYYY-MM-DDTHH:mm:SSZ or
+                                YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to
+                                "since:<date>" in classic search syntax.
+  --until UNTIL                 Filter results for posts before the indicated
+                                datetime (NOT inclusive). Expected to use
+                                'createdAt' timestamp, with a millisecond
+                                precision. Can be a datetime, or just an ISO
+                                date (YYYY-MM-DDTHH:mm:SSZ or
+                                YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to
+                                "until:<date>" in classic search syntax.
+  --url URL                     Filter posts with links (facet links or embeds)
+                                pointing to this URL. Server may apply URL
+                                normalization or fuzzy matching. The only
+                                equivalent in classic search syntax could be
+                                typing the URL as a keyword.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the querys you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Collect last 500 posts containing the word "new" until 2024-01-01 at 16:15 UTC:
+    $ minet bsky search-posts "new" --until 2024-01-01T16:15 --limit 500 > posts.csv
+
+. Collect the posts containing the word "new" mentionning user "alice.bsky.social" since 2025-01-01:
+    $ minet bsky search-posts "new" --mentions alice.bsky.social --since 2025-01-01 > posts.csv
+
+. Collect the posts containing the tag '#bluesky' in Spanish:
+    $ minet bsky search-posts "#bluesky" -l es > posts.csv
+
+. Collect the posts containing the word "bluesky" but not the word "twitter":
+    $ minet bsky search-posts "bluesky -twitter" > posts.csv
+
+. Collect the posts containing the word "bluesky" and a link to "youtube.com":
+    $ minet bsky search-posts "bluesky" --domain youtube.com > posts.csv
+
+Tips:
+
+- You can use partial ISO dates (YYYY or YYYY-MM or YYYY-MM-DD or YYYY-MM-DDTHH or YYYY-MM-DDTHH:MM or YYYY-MM-DDTHH:MM:SS or YYYY-MM-DDTHH:MM:SS.ssssss) for the --since and --until arguments.
+
+- To filter posts by given tags, use the hashtag syntax, e.g. "#bluesky" in the query. Multiple tags can be specified, with 'AND' matching.
+
+- To filter posts without given keywords, use the minus syntax, e.g. "-twitter" in the query. Multiple keywords can be specified, with 'AND' matching.
+
+Warning:
+
+- After some tests, it seems that the posts returned by the Bluesky API are not always perfectly sorted by the local time we give (with millisecond precision). Indeed, this local time depends on the 'createdAt' field of the post, and we observed that in some cases, this value is artificial (cf their indexation code : https://github.com/bluesky-social/indigo/blob/c5eaa30f683f959af20ea17fdf390d8a22d471cd/search/transform.go#L225).
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet bluesky search-posts "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet bluesky search-posts column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet bluesky search-posts column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet bluesky search-posts column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet bluesky search-posts "value1,value2" --explode ","
+```
+
+### search-users
+
+```
+Usage: minet bluesky search-users [-h] [-l LIMIT] [--silent]
+                                  [--refresh-per-second REFRESH_PER_SECOND]
+                                  [--simple-progress] [--identifier IDENTIFIER]
+                                  [--rcfile RCFILE] [--password PASSWORD]
+                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
+                                  query_or_query_column
+
+# Minet Bluesky Search Users Command
+
+Search for whether Bluesky profiles matching a query or multiple Bluesky profiles matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API. A profile matches a query if the user's name, handle or bio matches the query. This command is equivalent to the classic search on Bluesky when filtering by 'People'.
 
 Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
@@ -1837,6 +2810,8 @@ Optional Arguments:
                                 configured in a .minetrc file as
                                 "bluesky.identifier" or read from the
                                 MINET_BLUESKY_IDENTIFIER env variable.
+  -l, --limit LIMIT             Limit the number of users to retrieve for each
+                                query. Will collect all users by default.
   --password PASSWORD           Bluesky app password (not your personal
                                 password, must be created here:
                                 https://bsky.app/settings/app-passwords). Can
@@ -1878,6 +2853,21 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
+Examples:
+
+. Search user by its handle:
+    $ minet bluesky search-users @bsky.app
+
+. Get 150 users from matching a query:
+    $ minet bluesky search-users <query> --limit 150
+
+. Get users from a CSV file:
+    $ minet bluesky search-users <query-column> -i queries.csv
+
+Note:
+
+- This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
+
 how to use the command with a CSV file?
 
 > A lot of minet commands, including this one, can both be
@@ -1890,20 +2880,20 @@ how to use the command with a CSV file?
 > columns to keep by using the -s/--select flag.
 
 . Here is how to use a command with a single value:
-    $ minet bluesky search-posts "value"
+    $ minet bluesky search-profiles "value"
 
 . Here is how to use a command with a CSV file:
-    $ minet bluesky search-posts column_name -i file.csv
+    $ minet bluesky search-profiles column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xan search -s col . | minet bluesky search-posts column_name -i -
+    $ xan search -s col . | minet bluesky search-profiles column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet bluesky search-posts column_name -i file.csv --explode "|"
+    $ minet bluesky search-profiles column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet bluesky search-posts "value1,value2" --explode ","
+    $ minet bluesky search-profiles "value1,value2" --explode ","
 ```
 
 ## Facebook
@@ -3890,8 +4880,8 @@ Optional Arguments:
 
 Example:
 
-. Searching comments from the user page of u/random_user:
-    $ minet reddit user-comments https://www.reddit.com/user/random_user/comments/ > random_user_comments.csv
+. Searching comments from the user page of u/reddit:
+    $ minet reddit user-comments https://www.reddit.com/user/reddit/comments/ > reddit_comments.csv
 
 how to use the command with a CSV file?
 
@@ -3977,8 +4967,8 @@ Optional Arguments:
 
 Example:
 
-. Searching posts from the user page of u/random_user:
-    $ minet reddit user-posts https://www.reddit.com/user/random_user/submitted/ > random_user_posts.csv
+. Searching posts from the user page of u/reddit:
+    $ minet reddit user-posts https://www.reddit.com/user/reddit/submitted/ > reddit_posts.csv
 
 how to use the command with a CSV file?
 
@@ -4226,7 +5216,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                current date.
+                                `2025-10-23`.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `2022-10-01`.
   --secret SECRET               Tiktok API identification secret. Can also be
@@ -4284,7 +5274,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                yesterday.
+                                `20251022`.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `20221001`.
   --secret SECRET               Tiktok API identification secret. Can also be

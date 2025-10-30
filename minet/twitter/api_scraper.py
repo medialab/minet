@@ -9,6 +9,7 @@ from typing import Optional
 import time
 import json
 import datetime
+from random import randint
 from urllib.parse import urlencode, quote
 from twitwi import normalize_tweet, normalize_user
 from ebbe import with_is_first, getpath, pathgetter
@@ -20,6 +21,7 @@ from minet.web import (
     request,
     create_request_retryer,
     retrying_method,
+    Response,
 )
 from minet.cookies import (
     coerce_cookie_for_url_from_browser,
@@ -992,3 +994,38 @@ class TwitterGuestAPIScraper:
         )
 
         return tweet
+
+
+class TwitterUnauthenticatedAPIScraper:
+    def __init__(self):
+        self.pool_manager = create_pool_manager(
+            timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT, spoof_tls_ciphers=True
+        )
+
+        def epilog_builder(retry_state: RetryCallState):
+            exc = retry_state.outcome.exception()
+
+            if hasattr(exc, "format_epilog") and callable(exc.format_epilog):
+                return exc.format_epilog()
+
+            return None
+
+        self.retryer = create_request_retryer(
+            min=1,
+            epilog=epilog_builder,
+        )
+
+    @retrying_method()
+    def request(self, url: str) -> Response:
+        return request(url, pool_manager=self.pool_manager)
+
+    def get_tweet(self, tweet_id: str, locale=None):
+        random_token = randint(0, 0xFFFFFFFF)
+
+        url = "https://cdn.syndication.twimg.com/tweet-result?id={}&token={}".format(
+            tweet_id, random_token
+        )
+
+        data = self.request(url).json()
+
+        return data

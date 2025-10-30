@@ -26,7 +26,16 @@ _Generic commands_
 _Platform-related commands_
 
 - [bluesky (bsky)](#bluesky)
+  - [follows](#follows)
+  - [followers](#followers)
+  - [posts](#posts)
+  - [profiles](#profiles)
+  - [user-posts](#user-posts)
+  - [resolve-post-url](#resolve-post-url)
+  - [resolve-handle](#resolve-handle)
   - [search-posts](#search-posts)
+  - [search-users](#search-users)
+
 - [facebook (fb)](#facebook)
   - [url-likes](#url-likes)
 - [google](#google)
@@ -66,7 +75,7 @@ _Platform-related commands_
   - [search-videos](#search-videos)
 - [twitter](#twitter)
   - [attrition](#attrition)
-  - [followers](#followers)
+  - [followers](#followers-1)
   - [followers-you-know](#followers-you-know)
   - [friends](#friends)
   - [list-followers](#list-followers)
@@ -209,9 +218,41 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% bsky %>
 
+### follows
+
+<% bsky/follows %>
+
+### followers
+
+<% bsky/followers %>
+
+### posts
+
+<% bsky/posts %>
+
+### profiles
+
+<% bsky/profiles %>
+
+### user-posts
+
+<% bsky/user-posts %>
+
+### resolve-post-url
+
+<% bsky/resolve-post-url %>
+
+### resolve-handle
+
+<% bsky/resolve-handle %>
+
 ### search-posts
 
 <% bsky/search-posts %>
+
+### search-users
+
+<% bsky/search-users %>
 
 ## Facebook
 
