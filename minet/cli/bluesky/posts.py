@@ -44,7 +44,11 @@ def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
         enricher.cells(cli_args.column, with_rows=True), key=lambda x: x[1], work=work
     ):
         with loading_bar.step():
-            post_row = format_post_as_csv_row(post) if post else None
+            post_row = (
+                format_post_as_csv_row(post, allow_erroneous_plurals=True)
+                if post
+                else None
+            )
             enricher.writerow(row, post_row)
 
 

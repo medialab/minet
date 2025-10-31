@@ -85,6 +85,6 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     writer.writerow({"error": error_message, "post": post_payload})
                     errors_file.flush()
                     continue
-                post_row = format_post_as_csv_row(post)
+                post_row = format_post_as_csv_row(post, allow_erroneous_plurals=True)
                 enricher.writerow(row, post_row)
                 loading_bar.nested_advance()
