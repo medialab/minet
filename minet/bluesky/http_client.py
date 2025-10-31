@@ -190,6 +190,7 @@ class BlueskyHTTPClient:
                     break
 
             oldest_date_changed = False
+            oldest_uris_len_changed = False
             old_len_oldest_post_uris = len(oldest_post_uris)
             new_oldest_post_uris.clear()
 
@@ -235,6 +236,7 @@ class BlueskyHTTPClient:
 
                 # We have a new oldest post date
                 oldest_date_changed = True
+                oldest_uris_len_changed = True
                 new_oldest_post_uris.clear()
                 new_oldest_post_uris.add(post["uri"])
                 oldest_post_timestamp_utc = post_timestamp_utc
@@ -248,7 +250,10 @@ class BlueskyHTTPClient:
             # as oldest_post_uris is only changed by adding NEW uris,
             # and uris already in the set are ignored when added again, i.e. the set isn't changed,
             # except in the case where the oldest post date changes.
-            oldest_uris_len_changed = len(oldest_post_uris) != old_len_oldest_post_uris
+            if not oldest_date_changed:
+                oldest_uris_len_changed = (
+                    len(oldest_post_uris) > old_len_oldest_post_uris
+                )
 
             cursor = data.get("cursor")
 
@@ -276,7 +281,7 @@ class BlueskyHTTPClient:
                 and cursor == old_cursor
             ):
                 console.print(
-                    "The oldest post date did not change, and no new uris were added to the 'already seen uris' list. Stopping.",
+                    f"The oldest post date did not change, no new uris were added to the 'already seen uris' list and we reached the same point as before (cursor = [blue]{cursor}[/blue]).\n\t[bold red]Stopping query [blue]{query}[/blue].[/bold red]",
                     style="yellow",
                 )
                 break
