@@ -267,6 +267,8 @@ class BlueskyHTTPClient:
                     until = datetime.fromtimestamp(
                         oldest_post_timestamp_utc_plus_delta / 1000, tz=timezone.utc
                     ).strftime(SOURCE_DATETIME_FORMAT_V2)
+                    while "-" in until[:4]:
+                        until = "0" + until
                 except ValueError as e:
                     # Get your shit together Bluesky...
                     if "out of range" in str(e).lower():
