@@ -28,6 +28,7 @@ _Platform-related commands_
 - [bluesky (bsky)](#bluesky)
   - [follows](#follows)
   - [followers](#followers)
+  - [quotes](#quotes)
   - [posts](#posts)
   - [profiles](#profiles)
   - [user-posts](#user-posts)
@@ -226,6 +227,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### followers
 
 <% bsky/followers %>
+
+### quotes
+
+<% bsky/quotes %>
 
 ### posts
 

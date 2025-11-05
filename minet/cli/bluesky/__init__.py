@@ -168,6 +168,37 @@ BLUESKY_PROFILES_COMMAND = command(
     """,
 )
 
+BLUESKY_QUOTES_COMMAND = command(
+    "quotes",
+    "minet.cli.bluesky.quotes",
+    title="Minet Bluesky Get Quotes From URL Or URI Command",
+    description="""
+        Get whether posts quoting a post giving its URL or URI or several posts quoting several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
+    """,
+    arguments=[
+        {
+            "flags": ["-l", "--limit"],
+            "type": int,
+            "help": "Limit the number of quotes to retrieve for each post. Will collect all quotes by default.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
+    variadic_input={"dummy_column": "url-or-uri"},
+    epilog="""
+        Examples:
+
+        . Get quotes for a post's URL:
+            $ minet bluesky quotes <post-url>
+
+        . Get 100 quotes for a post's URI:
+            $ minet bluesky quotes <post-uri> --limit 100
+
+        . Get quotes for posts by URLs from a CSV file:
+            $ minet bluesky quotes <url-column> -i posts.csv
+
+""",
+)
+
 BLUESKY_USER_POSTS_COMMAND = command(
     "user-posts",
     "minet.cli.bluesky.user_posts",
@@ -407,6 +438,7 @@ BLUESKY_COMMAND = command(
         BLUESKY_FOLLOWERS_COMMAND,
         BLUESKY_POSTS_COMMAND,
         BLUESKY_PROFILES_COMMAND,
+        BLUESKY_QUOTES_COMMAND,
         BLUESKY_USER_POSTS_COMMAND,
         BLUESKY_REPOSTED_BY_COMMAND,
         BLUESKY_RESOLVE_POST_URL_COMMAND,

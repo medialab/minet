@@ -29,6 +29,14 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             path="com.atproto.server.createSession",
         )
 
+    def quotes(
+        self, post_uri: str, cursor: Optional[str] = None, limit: int = 100
+    ) -> str:
+        return self.format(
+            path="app.bsky.feed.getQuotes",
+            args={"uri": post_uri, "cursor": cursor, "limit": limit},
+        )
+
     def refresh_session(self) -> str:
         return self.format(path="com.atproto.server.refreshSession")
 

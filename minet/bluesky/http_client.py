@@ -129,6 +129,23 @@ class BlueskyHTTPClient:
 
         return response
 
+    def quotes(self, post_uri: str) -> Iterator[BlueskyPost]:
+        cursor = None
+
+        while True:
+            url = self.urls.quotes(post_uri, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for post in data["posts"]:
+                yield normalize_post(post)
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
+
     def search_posts(
         self,
         query: str,
