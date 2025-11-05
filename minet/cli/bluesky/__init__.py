@@ -42,7 +42,7 @@ BLUESKY_FOLLOWS_COMMAND = command(
     variadic_input={"dummy_column": "handle-or-did"},
     epilog="""
         Examples:
-        
+
         . Get follows of a user by their handle:
             $ minet bluesky follows @bsky.app
 
@@ -80,7 +80,7 @@ BLUESKY_FOLLOWERS_COMMAND = command(
     variadic_input={"dummy_column": "handle-or-did"},
     epilog="""
         Examples:
-        
+
         . Get followers of a user by their handle:
             $ minet bluesky followers @bsky.app
 
@@ -121,10 +121,10 @@ BLUESKY_POSTS_COMMAND = command(
 
         . Get a post from its URI:
             $ minet bluesky posts <uri>
-        
+
         . Get a post from its URL:
             $ minet bluesky posts <url>
-        
+
         . Get multiple posts from their URIs from a CSV file:
             $ minet bluesky posts <uri-column> -i posts.csv
 
@@ -152,7 +152,7 @@ BLUESKY_PROFILES_COMMAND = command(
     variadic_input={"dummy_column": "handle-or-did"},
     epilog="""
         Examples:
-        
+
         . Get profile from a user by their handle:
             $ minet bluesky profiles @bsky.app
 
@@ -186,19 +186,53 @@ BLUESKY_USER_POSTS_COMMAND = command(
     ],
     epilog="""
         Examples:
-        
+
         . Get posts from a user by their handle:
             $ minet bluesky user-posts @bsky.app
-        
+
         . Get 150 last posts from a user by their DID:
             $ minet bluesky user-posts did:plc:z72i7hdynmk6r22z27h6tvur --limit 150
-        
+
         . Get posts from users by their handles from a CSV file:
             $ minet bluesky user-posts <handle-column> -i users.csv
 
         Tips:
 
         - If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+    """,
+)
+
+BLUESKY_REPOSTED_BY_COMMAND = command(
+    "reposted-by",
+    "minet.cli.bluesky.reposted_by",
+    title="Minet Bluesky Get Reposted By From URL Or URI Command",
+    description="""
+        Get user who reposted whether a post giving its URL or URI or several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
+    """,
+    arguments=[
+        {
+            "flags": ["-l", "--limit"],
+            "type": int,
+            "help": "Limit the number of users to retrieve for each post. Will collect all users by default.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
+    variadic_input={"dummy_column": "url-or-uri"},
+    epilog="""
+        Examples:
+
+        . Get reposted by a user by a post's URL:
+            $ minet bluesky reposted-by <post-url>
+
+        . Get 100 reposted by user by a post's URI:
+            $ minet bluesky reposted-by <post-uri> --limit 100
+
+        . Get reposted by users by post URLs from a CSV file:
+            $ minet bluesky reposted-by <url-column> -i posts.csv
+
+        Note:
+
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
     """,
 )
 
@@ -213,7 +247,7 @@ BLUESKY_RESOLVE_POST_URL_COMMAND = command(
     variadic_input={"dummy_column": "url"},
     epilog="""
         Examples:
-        
+
         . Get a post URI from its URL:
             $ minet bluesky resolve-post-url <url>
 
@@ -236,7 +270,7 @@ BLUESKY_RESOLVE_HANDLE_COMMAND = command(
 
         . Get a user DID from their handle:
             $ minet bluesky resolve-handle @bsky.app
-        
+
         . Get multiple user DIDs from their handles from a CSV file:
             $ minet bluesky resolve-handle <handle-column> -i users.csv
 
@@ -294,13 +328,13 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
     ],
     epilog="""
         Examples:
-        
+
         . Collect last 500 posts containing the word "new" until 2024-01-01 at 16:15 UTC:
             $ minet bsky search-posts "new" --until 2024-01-01T16:15 --limit 500 > posts.csv
 
         . Collect the posts containing the word "new" mentionning user "alice.bsky.social" since 2025-01-01:
             $ minet bsky search-posts "new" --mentions alice.bsky.social --since 2025-01-01 > posts.csv
-        
+
         . Collect the posts containing the tag '#bluesky' in Spanish:
             $ minet bsky search-posts "#bluesky" -l es > posts.csv
 
@@ -319,7 +353,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
         - To filter posts without given keywords, use the minus syntax, e.g. "-twitter" in the query. Multiple keywords can be specified, with 'AND' matching.
 
         Warning:
-        
+
         - After some tests, it seems that the posts returned by the Bluesky API are not always perfectly sorted by the local time we give (with millisecond precision). Indeed, this local time depends on the 'createdAt' field of the post, and we observed that in some cases, this value is artificial (cf their indexation code : https://github.com/bluesky-social/indigo/blob/c5eaa30f683f959af20ea17fdf390d8a22d471cd/search/transform.go#L225).
     """,
 )
@@ -374,6 +408,7 @@ BLUESKY_COMMAND = command(
         BLUESKY_POSTS_COMMAND,
         BLUESKY_PROFILES_COMMAND,
         BLUESKY_USER_POSTS_COMMAND,
+        BLUESKY_REPOSTED_BY_COMMAND,
         BLUESKY_RESOLVE_POST_URL_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,
         BLUESKY_SEARCH_POSTS_COMMAND,

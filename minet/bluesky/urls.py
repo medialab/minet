@@ -32,6 +32,14 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
     def refresh_session(self) -> str:
         return self.format(path="com.atproto.server.refreshSession")
 
+    def reposted_by(
+        self, post_uri: str, cursor: Optional[str] = None, limit: int = 100
+    ) -> str:
+        return self.format(
+            path="app.bsky.feed.getRepostedBy",
+            args={"uri": post_uri, "cursor": cursor, "limit": limit},
+        )
+
     def resolve_handle(self, handle: str, _alternate_api=False) -> str:
         # Handles resolving of special handles based on a different DNS do not work on the regular API, we need to use the alternate endpoint from the public facing API
         # cf https://github.com/bluesky-social/indigo/issues/833

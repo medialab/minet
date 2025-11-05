@@ -31,6 +31,7 @@ _Platform-related commands_
   - [posts](#posts)
   - [profiles](#profiles)
   - [user-posts](#user-posts)
+  - [reposted-by](#reposted-by)
   - [resolve-post-url](#resolve-post-url)
   - [resolve-handle](#resolve-handle)
   - [search-posts](#search-posts)
@@ -237,6 +238,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### user-posts
 
 <% bsky/user-posts %>
+
+### reposted-by
+
+<% bsky/reposted-by %>
 
 ### resolve-post-url
 

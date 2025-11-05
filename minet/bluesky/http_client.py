@@ -265,6 +265,23 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
+    def reposted_by(self, post_uri: str) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        while True:
+            url = self.urls.reposted_by(post_uri, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["repostedBy"]:
+                yield normalize_partial_profile(profile)
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
+
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
         identifier = identifier.lstrip("@")
 
