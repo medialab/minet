@@ -284,7 +284,7 @@ class BlueskyHTTPClient:
                 and cursor == old_cursor
             ):
                 console.print(
-                    f"The oldest post date did not change, no new uris were added to the 'already seen uris' list and we reached the same point as before (cursor = [blue]{cursor}[/blue]).\n\t[bold red]Stopping query [blue]{query}[/blue].[/bold red]",
+                    f"The oldest post date did not change, no new uris were added to the 'already seen uris' list and we reached the same point as before (cursor = [blue]{cursor}[/blue]).",
                     style="yellow",
                 )
                 break
@@ -294,6 +294,8 @@ class BlueskyHTTPClient:
             # at the beginning of a new time range page
             if oldest_uris_len_changed:
                 old_cursor = cursor
+
+        console.print(f"\t[bold red]Stopping query [blue]{query}[/blue].[/bold red]")
 
     def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
