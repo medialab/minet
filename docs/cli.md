@@ -1812,7 +1812,7 @@ Usage: minet bluesky [-h]
                      {firehose,follows,followers,posts,profiles,quotes,user-posts,reposted-by,resolve-post-url,resolve-handle,search-posts,search-users}
                      ...
 
-# Minet Bluesky Command
+# Minet Bluesky command
 
 Collect data from Bluesky.
 
@@ -1822,22 +1822,22 @@ Optional Arguments:
 Subcommands:
   {firehose,follows,followers,posts,profiles,quotes,user-posts,reposted-by,resolve-post-url,resolve-handle,search-posts,search-users}
                                 Subcommand to use.
-    firehose                    Minet Bluesky Firehose Command
-    follows                     Minet Bluesky Get Follows From Handle Or DID
-                                Command
-    followers                   Minet Bluesky Get Followers From Handle Or DID
-                                Command
-    posts                       Minet Bluesky Get Post From URI or URL Command
-    profiles                    Minet Bluesky Get Profile From Handle Or DID
-                                Command
-    quotes                      Minet Bluesky Get Quotes From URL Or URI Command
-    user-posts                  Minet Bluesky Get User Posts Command
-    reposted-by                 Minet Bluesky Get Reposted By From URL Or URI
-                                Command
-    resolve-post-url            Minet Bluesky resolve URL to URI Command
-    resolve-handle              Minet Bluesky Resolve Handle Command
-    search-posts                Minet Bluesky Search Post Command
-    search-users                Minet Bluesky Search Users Command
+    firehose                    Minet Bluesky Firehose command
+    follows                     Minet Bluesky Get Follows from Handle or DID
+                                command
+    followers                   Minet Bluesky Get Followers from Handle or DID
+                                command
+    posts                       Minet Bluesky Get Post from URI or URL command
+    profiles                    Minet Bluesky Get Profile from Handle or DID
+                                command
+    quotes                      Minet Bluesky Get Quotes from URL or URI command
+    user-posts                  Minet Bluesky Get User Posts command
+    reposted-by                 Minet Bluesky Get Reposted By from URL or URI
+                                command
+    resolve-post-url            Minet Bluesky resolve URL to URI command
+    resolve-handle              Minet Bluesky Resolve Handle command
+    search-posts                Minet Bluesky Search Post command
+    search-users                Minet Bluesky Search Users command
 ```
 
 ### follows
@@ -1849,16 +1849,15 @@ Usage: minet bluesky follows [-h] [-l LIMIT] [--silent]
                              [--rcfile RCFILE] [--password PASSWORD] [-i INPUT]
                              [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                              [-o OUTPUT]
-                             handle-or-did_or_handle-or-did_column
+                             profile_or_profile_column
 
-# Minet Bluesky Get Follows From Handle Or DID Command
+# Minet Bluesky Get Follows from Handle or DID command
 
 Get whether follows of a user giving its handle or DID or respective follows of several users given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
 
 Positional Arguments:
-  handle-or-did_or_handle-or-did_column
-                                Single handle-or-did to process or name of the
-                                CSV column containing handle-or-dids when using
+  profile_or_profile_column     Single profile to process or name of the CSV
+                                column containing profiles when using
                                 -i/--input.
 
 Optional Arguments:
@@ -1887,8 +1886,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the handle-or-dids you want to process. Will
-                                consider `-` as stdin.
+                                the profiles you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -1966,16 +1965,15 @@ Usage: minet bluesky followers [-h] [-l LIMIT] [--silent]
                                [--rcfile RCFILE] [--password PASSWORD]
                                [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                [--total TOTAL] [-o OUTPUT]
-                               handle-or-did_or_handle-or-did_column
+                               profile_or_profile_column
 
-# Minet Bluesky Get Followers From Handle Or DID Command
+# Minet Bluesky Get Followers from Handle or DID command
 
 Get whether followers of a user giving its handle or DID or respective followers of several users given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
 
 Positional Arguments:
-  handle-or-did_or_handle-or-did_column
-                                Single handle-or-did to process or name of the
-                                CSV column containing handle-or-dids when using
+  profile_or_profile_column     Single profile to process or name of the CSV
+                                column containing profiles when using
                                 -i/--input.
 
 Optional Arguments:
@@ -2005,8 +2003,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the handle-or-dids you want to process. Will
-                                consider `-` as stdin.
+                                the profiles you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2084,17 +2082,15 @@ Usage: minet bluesky quotes [-h] [-l LIMIT] [--silent]
                             [--rcfile RCFILE] [--password PASSWORD] [-i INPUT]
                             [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                             [-o OUTPUT]
-                            url-or-uri_or_url-or-uri_column
+                            post_or_post_column
 
-# Minet Bluesky Get Quotes From URL Or URI Command
+# Minet Bluesky Get Quotes from URL or URI command
 
 Get whether posts quoting a post giving its URL or URI or several posts quoting several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
 
 Positional Arguments:
-  url-or-uri_or_url-or-uri_column
-                                Single url-or-uri to process or name of the CSV
-                                column containing url-or-uris when using
-                                -i/--input.
+  post_or_post_column           Single post to process or name of the CSV column
+                                containing posts when using -i/--input.
 
 Optional Arguments:
   --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
@@ -2122,8 +2118,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the url-or-uris you want to process. Will
-                                consider `-` as stdin.
+                                the posts you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2193,17 +2189,15 @@ Usage: minet bluesky posts [-h] [--raw] [--silent]
                            [--rcfile RCFILE] [--password PASSWORD] [-i INPUT]
                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                            [-o OUTPUT]
-                           uri-or-url_or_uri-or-url_column
+                           post_or_post_column
 
-# Minet Bluesky Get Post From URI or URL Command
+# Minet Bluesky Get Post from URI or URL command
 
 Get whether a Bluesky post given its URI or URL or multiple Bluesky posts given their URIs or URLs from the column of a CSV file. This command uses the Bluesky HTTP API.
 
 Positional Arguments:
-  uri-or-url_or_uri-or-url_column
-                                Single uri-or-url to process or name of the CSV
-                                column containing uri-or-urls when using
-                                -i/--input.
+  post_or_post_column           Single post to process or name of the CSV column
+                                containing posts when using -i/--input.
 
 Optional Arguments:
   --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
@@ -2232,8 +2226,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the uri-or-urls you want to process. Will
-                                consider `-` as stdin.
+                                the posts you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2307,16 +2301,15 @@ Usage: minet bluesky profiles [-h] [--raw] [--silent]
                               [--rcfile RCFILE] [--password PASSWORD] [-i INPUT]
                               [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                               [-o OUTPUT]
-                              handle-or-did_or_handle-or-did_column
+                              profile_or_profile_column
 
-# Minet Bluesky Get Profile From Handle Or DID Command
+# Minet Bluesky Get Profile from Handle or DID command
 
 Get whether a Bluesky profile given the user handle or DID or multiple Bluesky profiles given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
 
 Positional Arguments:
-  handle-or-did_or_handle-or-did_column
-                                Single handle-or-did to process or name of the
-                                CSV column containing handle-or-dids when using
+  profile_or_profile_column     Single profile to process or name of the CSV
+                                column containing profiles when using
                                 -i/--input.
 
 Optional Arguments:
@@ -2346,8 +2339,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the handle-or-dids you want to process. Will
-                                consider `-` as stdin.
+                                the profiles you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2421,16 +2414,15 @@ Usage: minet bluesky user-posts [-h] [-l LIMIT] [--silent]
                                 [--rcfile RCFILE] [--password PASSWORD]
                                 [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                 [--total TOTAL] [-o OUTPUT]
-                                handle-or-did_or_handle-or-did_column
+                                profile_or_profile_column
 
-# Minet Bluesky Get User Posts Command
+# Minet Bluesky Get User Posts command
 
 Retrieves Bluesky posts whether by user using its handle (e.g. @bsky.app) or DID (did:...) or multiple users given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
 
 Positional Arguments:
-  handle-or-did_or_handle-or-did_column
-                                Single handle-or-did to process or name of the
-                                CSV column containing handle-or-dids when using
+  profile_or_profile_column     Single profile to process or name of the CSV
+                                column containing profiles when using
                                 -i/--input.
 
 Optional Arguments:
@@ -2459,8 +2451,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the handle-or-dids you want to process. Will
-                                consider `-` as stdin.
+                                the profiles you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2534,17 +2526,15 @@ Usage: minet bluesky reposted-by [-h] [-l LIMIT] [--silent]
                                  [--rcfile RCFILE] [--password PASSWORD]
                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                  [--total TOTAL] [-o OUTPUT]
-                                 url-or-uri_or_url-or-uri_column
+                                 post_or_post_column
 
-# Minet Bluesky Get Reposted By From URL Or URI Command
+# Minet Bluesky Get Reposted By from URL or URI command
 
 Get user who reposted whether a post giving its URL or URI or several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
 
 Positional Arguments:
-  url-or-uri_or_url-or-uri_column
-                                Single url-or-uri to process or name of the CSV
-                                column containing url-or-uris when using
-                                -i/--input.
+  post_or_post_column           Single post to process or name of the CSV column
+                                containing posts when using -i/--input.
 
 Optional Arguments:
   --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
@@ -2572,8 +2562,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the url-or-uris you want to process. Will
-                                consider `-` as stdin.
+                                the posts you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2649,7 +2639,7 @@ Usage: minet bluesky resolve-post-url [-h] [--identifier IDENTIFIER]
                                       [--total TOTAL] [-o OUTPUT]
                                       url_or_url_column
 
-# Minet Bluesky resolve URL to URI Command
+# Minet Bluesky resolve URL to URI command
 
 Resolve whether a Bluesky post URL to its URI or multiple Bluesky post URLs to their URIs from column of a CSV file. This command does not use the Bluesky HTTP API.
 
@@ -2751,7 +2741,7 @@ Usage: minet bluesky resolve-handle [-h] [--identifier IDENTIFIER]
                                     [--total TOTAL] [-o OUTPUT]
                                     handle_or_handle_column
 
-# Minet Bluesky Resolve Handle Command
+# Minet Bluesky Resolve Handle command
 
 Resolve whether a Bluesky handle to its DID or multiple Bluesky handles to their DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
 
@@ -2861,7 +2851,7 @@ Usage: minet bluesky search-posts [-h] [--lang LANG] [--silent]
                                   [--total TOTAL] [-o OUTPUT]
                                   query_or_query_column
 
-# Minet Bluesky Search Post Command
+# Minet Bluesky Search Post command
 
 Search for whether Bluesky posts matching a query or multiple Bluesky posts matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API.
 
@@ -3023,7 +3013,7 @@ Usage: minet bluesky search-users [-h] [-l LIMIT] [--silent]
                                   [--total TOTAL] [-o OUTPUT]
                                   query_or_query_column
 
-# Minet Bluesky Search Users Command
+# Minet Bluesky Search Users command
 
 Search for whether Bluesky profiles matching a query or multiple Bluesky profiles matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API. A profile matches a query if the user's name, handle or bio matches the query. This command is equivalent to the classic search on Bluesky when filtering by 'People'.
 
@@ -5443,7 +5433,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `2025-11-05`.
+                                today.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `2022-10-01`.
   --secret SECRET               Tiktok API identification secret. Can also be
@@ -5501,7 +5491,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `20251104`.
+                                today.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `20221001`.
   --secret SECRET               Tiktok API identification secret. Can also be
