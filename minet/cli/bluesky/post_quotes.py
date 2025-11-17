@@ -35,7 +35,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
         else:
             uri = client.resolve_post_url(param)
         with loading_bar.step(uri, sub_total=sub_total):
-            for post in islice(client.quotes(uri), sub_total):
+            for post in islice(client.post_quotes(uri), sub_total):
                 quote_row = format_post_as_csv_row(post)
                 enricher.writerow(row, quote_row)
                 loading_bar.nested_advance()

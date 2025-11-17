@@ -29,7 +29,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             path="com.atproto.server.createSession",
         )
 
-    def quotes(
+    def post_quotes(
         self, post_uri: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -40,7 +40,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
     def refresh_session(self) -> str:
         return self.format(path="com.atproto.server.refreshSession")
 
-    def reposted_by(
+    def post_reposted_by(
         self, post_uri: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -59,7 +59,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"handle": handle},
         )
 
-    def get_follows(
+    def user_follows(
         self, did: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -67,7 +67,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"actor": did, "cursor": cursor, "limit": limit},
         )
 
-    def get_followers(
+    def user_followers(
         self, did: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -75,12 +75,12 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"actor": did, "cursor": cursor, "limit": limit},
         )
 
-    def get_posts(self, uris: List[str]) -> str:
+    def posts(self, uris: List[str]) -> str:
         return self.format(
             path="app.bsky.feed.getPosts", args=[("uris", uri) for uri in uris]
         )
 
-    def get_profiles(self, identifiers: List[str]) -> str:
+    def users(self, identifiers: List[str]) -> str:
         return self.format(
             path="app.bsky.actor.getProfiles",
             args=[("actors", identifier) for identifier in identifiers],
@@ -119,7 +119,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args=args,
         )
 
-    def search_profiles(
+    def search_users(
         self, query: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -127,7 +127,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"term": query, "cursor": cursor, "limit": limit},
         )
 
-    def get_user_posts(
+    def user_posts(
         self,
         identifier: str,
         cursor: Optional[str] = None,

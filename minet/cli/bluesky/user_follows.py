@@ -16,10 +16,10 @@ from minet.bluesky import BlueskyHTTPClient
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
     headers=PARTIAL_PROFILE_FIELDS,
-    title="Getting Bluesky followers",
-    unit="profiles",
+    title="Getting Bluesky follows",
+    unit="users",
     nested=True,
-    sub_unit="followers",
+    sub_unit="follows",
 )
 def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
@@ -33,10 +33,10 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
         if cli_args.limit:
             sub_total = int(cli_args.limit)
         else:
-            sub_total = next(client.get_profiles([did]))["followers"]
+            sub_total = next(client.users([did]))["follows"]
 
         with loading_bar.step(did, sub_total=sub_total):
-            for follower in islice(client.get_followers(did), sub_total):
-                follower_row = format_partial_profile_as_csv_row(follower)
-                enricher.writerow(row, follower_row)
+            for follow in islice(client.user_follows(did), sub_total):
+                follow_row = format_partial_profile_as_csv_row(follow)
+                enricher.writerow(row, follow_row)
                 loading_bar.nested_advance()

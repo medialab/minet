@@ -129,11 +129,11 @@ class BlueskyHTTPClient:
 
         return response
 
-    def quotes(self, post_uri: str) -> Iterator[BlueskyPost]:
+    def post_quotes(self, post_uri: str) -> Iterator[BlueskyPost]:
         cursor = None
 
         while True:
-            url = self.urls.quotes(post_uri, cursor=cursor)
+            url = self.urls.post_quotes(post_uri, cursor=cursor)
 
             response = self.request(url)
             data = response.json()
@@ -266,10 +266,10 @@ class BlueskyHTTPClient:
             if not oldest_uris_len_changed and not oldest_date_changed:
                 break
 
-    def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
+    def search_users(self, query: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
         while True:
-            url = self.urls.search_profiles(query, cursor=cursor)
+            url = self.urls.search_users(query, cursor=cursor)
 
             response = self.request(url)
             data = response.json()
@@ -282,11 +282,11 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
-    def reposted_by(self, post_uri: str) -> Iterator[BlueskyPartialProfile]:
+    def post_reposted_by(self, post_uri: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
         while True:
-            url = self.urls.reposted_by(post_uri, cursor=cursor)
+            url = self.urls.post_reposted_by(post_uri, cursor=cursor)
 
             response = self.request(url)
             data = response.json()
@@ -324,11 +324,11 @@ class BlueskyHTTPClient:
 
         return format_post_at_uri(did, rkey)
 
-    def get_follows(self, did: str) -> Iterator[BlueskyPartialProfile]:
+    def user_follows(self, did: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
         while True:
-            url = self.urls.get_follows(did, cursor=cursor)
+            url = self.urls.user_follows(did, cursor=cursor)
 
             response = self.request(url)
             data = response.json()
@@ -341,11 +341,11 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
-    def get_followers(self, did: str) -> Iterator[BlueskyPartialProfile]:
+    def user_followers(self, did: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
         while True:
-            url = self.urls.get_followers(did, cursor=cursor)
+            url = self.urls.user_followers(did, cursor=cursor)
 
             response = self.request(url)
             data = response.json()
@@ -359,11 +359,11 @@ class BlueskyHTTPClient:
                 break
 
     # NOTE: this API route does not return any results for at-uris containing handles!
-    def get_posts(
+    def posts(
         self, did_at_uris: Iterable[str], return_raw=False
     ) -> Iterator[Optional[Union[BlueskyPost, Dict]]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
-            url = self.urls.get_posts(chunk)
+            url = self.urls.posts(chunk)
             response = self.request(url)
             data = response.json()
 
@@ -382,11 +382,11 @@ class BlueskyHTTPClient:
                 # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post_data)
 
-    def get_user_posts(self, did: str) -> Iterator[BlueskyPost]:
+    def user_posts(self, did: str) -> Iterator[BlueskyPost]:
         cursor = None
 
         while True:
-            url = self.urls.get_user_posts(did, cursor=cursor)
+            url = self.urls.user_posts(did, cursor=cursor)
 
             response = self.request(url)
             data = response.json()
@@ -401,11 +401,11 @@ class BlueskyHTTPClient:
                 break
 
     # NOTE: does this need to accept Optional[str]?
-    def get_profiles(
+    def users(
         self, identifiers: Iterable[Optional[str]], return_raw=False
     ) -> Iterator[Optional[Union[BlueskyProfile, Dict]]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
-            url = self.urls.get_profiles(chunk)
+            url = self.urls.users(chunk)
             response = self.request(url)
             data = response.json()
 

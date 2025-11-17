@@ -31,7 +31,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
             did = user
         with loading_bar.step(did):
             for post in islice(
-                client.get_user_posts(did),
+                client.user_posts(did),
                 int(cli_args.limit) if cli_args.limit else None,
             ):
                 post_row = format_post_as_csv_row(post)

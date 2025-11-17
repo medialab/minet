@@ -16,27 +16,22 @@ from minet.bluesky import BlueskyHTTPClient
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
     headers=PARTIAL_PROFILE_FIELDS,
-    title="Getting Bluesky follows",
-    unit="profiles",
+    title="Searching users",
+    unit="queries",
     nested=True,
-    sub_unit="follows",
+    sub_unit="users",
 )
 def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
-    for row, user in enricher.cells(cli_args.column, with_rows=True):
-        if not user.startswith("did:"):
-            did = client.resolve_handle(user)
-        else:
-            did = user
+    if cli_args.limit:
+        sub_total = int(cli_args.limit)
+    else:
+        sub_total = None
 
-        if cli_args.limit:
-            sub_total = int(cli_args.limit)
-        else:
-            sub_total = next(client.get_profiles([did]))["follows"]
-
-        with loading_bar.step(did, sub_total=sub_total):
-            for follow in islice(client.get_follows(did), sub_total):
-                follow_row = format_partial_profile_as_csv_row(follow)
-                enricher.writerow(row, follow_row)
+    for row, query in enricher.cells(cli_args.column, with_rows=True):
+        with loading_bar.step(query, sub_total=sub_total, count=cli_args.total):
+            for profile in islice(client.search_users(query), sub_total):
+                profile_row = format_partial_profile_as_csv_row(profile)
+                enricher.writerow(row, profile_row)
                 loading_bar.nested_advance()
