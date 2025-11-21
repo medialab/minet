@@ -282,6 +282,23 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
+    def post_liked_by(self, post_uri: str) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        while True:
+            url = self.urls.post_liked_by(post_uri, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["likes"]:
+                yield normalize_partial_profile(profile["actor"])
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
+
     def post_reposted_by(self, post_uri: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 

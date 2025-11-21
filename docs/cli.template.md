@@ -27,6 +27,7 @@ _Platform-related commands_
 
 - [bluesky (bsky)](#bluesky)
   - [posts](#posts)
+  - [post-liked-by](#post-liked-by)
   - [post-quotes](#post-quotes)
   - [post-reposted-by](#post-reposted-by)
   - [resolve-handle](#resolve-handle)
@@ -223,6 +224,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### posts
 
 <% bsky/posts %>
+
+### post-liked-by
+
+<% bsky/post-liked-by %>
 
 ### post-quotes
 

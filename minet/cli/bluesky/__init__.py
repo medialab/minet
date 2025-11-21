@@ -233,6 +233,40 @@ BLUESKY_USER_POSTS_COMMAND = command(
     """,
 )
 
+BLUESKY_POST_LIKED_BY_COMMAND = command(
+    "post-liked-by",
+    "minet.cli.bluesky.post_liked_by",
+    title="Minet Bluesky Get Liked By from URL or URI command",
+    description="""
+        Get user who liked whether a post giving its URL or URI or several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
+    """,
+    arguments=[
+        {
+            "flags": ["-l", "--limit"],
+            "type": int,
+            "help": "Limit the number of users to retrieve for each post. Will collect all users by default.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
+    variadic_input={"dummy_column": "post"},
+    epilog="""
+        Examples:
+
+        . Get users who liked a post from the post's URL:
+            $ minet bluesky post-liked-by <post-url>
+
+        . Get 100 users who liked a post from the post's URI:
+            $ minet bluesky post-liked-by <post-uri> --limit 100
+
+        . Get users who liked a post from post URLs from a CSV file:
+            $ minet bluesky post-liked-by <url-column> -i posts.csv
+
+        Note:
+
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky users` command.
+    """,
+)
+
 BLUESKY_POST_REPOSTED_BY_COMMAND = command(
     "post-reposted-by",
     "minet.cli.bluesky.post_reposted_by",
@@ -252,13 +286,13 @@ BLUESKY_POST_REPOSTED_BY_COMMAND = command(
     epilog="""
         Examples:
 
-        . Get reposted by a user by a post's URL:
+        . Get users who reposted a post from the post's URL:
             $ minet bluesky post-reposted-by <post-url>
 
-        . Get 100 reposted by user by a post's URI:
+        . Get 100 users who reposted a post from the post's URI:
             $ minet bluesky post-reposted-by <post-uri> --limit 100
 
-        . Get reposted by users by post URLs from a CSV file:
+        . Get users who reposted a post from post URLs from a CSV file:
             $ minet bluesky post-reposted-by <url-column> -i posts.csv
 
         Note:
@@ -435,6 +469,7 @@ BLUESKY_COMMAND = command(
     subcommands=[
         BLUESKY_FIREHOSE_COMMAND,
         BLUESKY_POSTS_COMMAND,
+        BLUESKY_POST_LIKED_BY_COMMAND,
         BLUESKY_POST_QUOTES_COMMAND,
         BLUESKY_POST_REPOSTED_BY_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,

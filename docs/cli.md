@@ -27,6 +27,7 @@ _Platform-related commands_
 
 - [bluesky (bsky)](#bluesky)
   - [posts](#posts)
+  - [post-liked-by](#post-liked-by)
   - [post-quotes](#post-quotes)
   - [post-reposted-by](#post-reposted-by)
   - [resolve-handle](#resolve-handle)
@@ -1809,7 +1810,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet bluesky [-h]
-                     {firehose,posts,post-quotes,post-reposted-by,resolve-handle,resolve-post-url,search-posts,search-users,users,user-followers,user-follows,user-posts}
+                     {firehose,posts,post-liked-by,post-quotes,post-reposted-by,resolve-handle,resolve-post-url,search-posts,search-users,users,user-followers,user-follows,user-posts}
                      ...
 
 # Minet Bluesky command
@@ -1820,10 +1821,12 @@ Optional Arguments:
   -h, --help                    show this help message and exit
 
 Subcommands:
-  {firehose,posts,post-quotes,post-reposted-by,resolve-handle,resolve-post-url,search-posts,search-users,users,user-followers,user-follows,user-posts}
+  {firehose,posts,post-liked-by,post-quotes,post-reposted-by,resolve-handle,resolve-post-url,search-posts,search-users,users,user-followers,user-follows,user-posts}
                                 Subcommand to use.
     firehose                    Minet Bluesky Firehose command
     posts                       Minet Bluesky Get Post from URI or URL command
+    post-liked-by               Minet Bluesky Get Liked By from URL or URI
+                                command
     post-quotes                 Minet Bluesky Get Quotes from URL or URI command
     post-reposted-by            Minet Bluesky Get Reposted By from URL or URI
                                 command
@@ -1950,6 +1953,117 @@ how to use the command with a CSV file?
 
 . This also works with single values:
     $ minet bluesky posts "value1,value2" --explode ","
+```
+
+### post-liked-by
+
+```
+Usage: minet bluesky post-liked-by [-h] [-l LIMIT] [--silent]
+                                   [--refresh-per-second REFRESH_PER_SECOND]
+                                   [--simple-progress] [--identifier IDENTIFIER]
+                                   [--rcfile RCFILE] [--password PASSWORD]
+                                   [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                   [--total TOTAL] [-o OUTPUT]
+                                   post_or_post_column
+
+# Minet Bluesky Get Liked By from URL or URI command
+
+Get user who liked whether a post giving its URL or URI or several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
+
+Positional Arguments:
+  post_or_post_column           Single post to process or name of the CSV column
+                                containing posts when using -i/--input.
+
+Optional Arguments:
+  --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
+                                `.bsky.social` at the end). Can also be
+                                configured in a .minetrc file as
+                                "bluesky.identifier" or read from the
+                                MINET_BLUESKY_IDENTIFIER env variable.
+  -l, --limit LIMIT             Limit the number of users to retrieve for each
+                                post. Will collect all users by default.
+  --password PASSWORD           Bluesky app password (not your personal
+                                password, must be created here:
+                                https://bsky.app/settings/app-passwords). Can
+                                also be configured in a .minetrc file as
+                                "bluesky.password" or read from the
+                                MINET_BLUESKY_PASSWORD env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the posts you want to process. Will consider `-`
+                                as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Get users who liked a post from the post's URL:
+    $ minet bluesky post-liked-by <post-url>
+
+. Get 100 users who liked a post from the post's URI:
+    $ minet bluesky post-liked-by <post-uri> --limit 100
+
+. Get users who liked a post from post URLs from a CSV file:
+    $ minet bluesky post-liked-by <url-column> -i posts.csv
+
+Note:
+
+- This command returns partial user profiles, which can be completed by using the `minet bluesky users` command.
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet bluesky post-liked-by "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet bluesky post-liked-by column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet bluesky post-liked-by column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet bluesky post-liked-by column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet bluesky post-liked-by "value1,value2" --explode ","
 ```
 
 ### post-quotes
@@ -2130,13 +2244,13 @@ Optional Arguments:
 
 Examples:
 
-. Get reposted by a user by a post's URL:
+. Get users who reposted a post from the post's URL:
     $ minet bluesky post-reposted-by <post-url>
 
-. Get 100 reposted by user by a post's URI:
+. Get 100 users who reposted a post from the post's URI:
     $ minet bluesky post-reposted-by <post-uri> --limit 100
 
-. Get reposted by users by post URLs from a CSV file:
+. Get users who reposted a post from post URLs from a CSV file:
     $ minet bluesky post-reposted-by <url-column> -i posts.csv
 
 Note:
@@ -5431,7 +5545,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `2025-11-17`.
+                                today.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `2022-10-01`.
   --secret SECRET               Tiktok API identification secret. Can also be
@@ -5489,7 +5603,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `20251116`.
+                                today.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `20221001`.
   --secret SECRET               Tiktok API identification secret. Can also be
