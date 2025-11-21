@@ -264,6 +264,36 @@ class BlueskyHTTPClient:
 
             cursor = data.get("cursor")
 
+            # If the oldest post date did not change, no new uris were added to the "already seen uris" list,
+            # and the cursor didn't advance further it means we have reached the end of the available posts.
+            # NOTE: due to the 10,000 posts limit per search query and the method we use to page with time ranges,
+            #       if there is more than 10,000 unique posts with the same date, we won't be able to get them all.
+            #       Moreover, when reaching that limit and time paging, we noticed that Bluesky API doesn't return
+            #       exactly the same 10,000 posts again: some new posts are found, but most are already seen, and
+            #       most importantly it seems that there is no logic behind the order of these posts, meaning
+            #       we are for now unable to retrieve the exact same posts when executing the same command
+            #       multiple time...
+            #       To be investigated...
+            if (
+                not oldest_uris_len_changed
+                and not oldest_date_changed
+                and cursor == old_cursor
+                and len(oldest_post_uris) <= 10000
+            ):
+                console.print(
+                    f"The oldest post date did not change, no new uris were added to the 'already seen uris' list and we reached the same point as before (cursor = [blue]{cursor}[/blue]).",
+                    style="yellow",
+                )
+                break
+
+            if len(oldest_post_uris) > 10000:
+                console.print(
+                    f"There is more than 10,000 posts with the same date ([blue]{datetime.fromtimestamp(oldest_post_timestamp_utc / 1000, tz=timezone.utc).strftime(SOURCE_DATETIME_FORMAT_V2) if oldest_post_timestamp_utc else 'N/A'}[/blue]), we will continue paging with time ranges to try to get more posts.",
+                    style="yellow",
+                )
+                oldest_post_timestamp_utc -= time_overlap
+                cursor = None  # to force time paging
+
             if cursor is None:
                 # NOTE: the until flag is exclusive
                 oldest_post_timestamp_utc_plus_delta = (
@@ -271,6 +301,8 @@ class BlueskyHTTPClient:
                 )
 
                 try:
+                    # NOTE: after some testing, it seems that Bluesky limits the number of results to 10,000 posts for search queries.
+                    #       That's why we now page with time ranges when we reach that limit, to reset it.
                     until = datetime.fromtimestamp(
                         oldest_post_timestamp_utc_plus_delta / 1000, tz=timezone.utc
                     ).strftime(SOURCE_DATETIME_FORMAT_V2)
@@ -280,20 +312,6 @@ class BlueskyHTTPClient:
                     # Get your shit together Bluesky...
                     if "out of range" in str(e).lower():
                         break
-
-            # If the oldest post date did not change, no new uris were added to the "already seen uris" list,
-            # and the cursor didn't advance further
-            # it means we have reached the end of the available posts
-            if (
-                not oldest_uris_len_changed
-                and not oldest_date_changed
-                and cursor == old_cursor
-            ):
-                console.print(
-                    f"The oldest post date did not change, no new uris were added to the 'already seen uris' list and we reached the same point as before (cursor = [blue]{cursor}[/blue]).",
-                    style="yellow",
-                )
-                break
 
             # If we added new uris (either with the same oldest post date or a new one, then we're seeing new posts)
             # The only cases we don't update the old_cursor is when we are seeing the same posts again,
