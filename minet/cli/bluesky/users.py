@@ -23,8 +23,8 @@ from minet.bluesky.exceptions import BlueskyHandleNotFound
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
     headers=PROFILE_FIELDS,
-    title="Getting Bluesky profiles from handles or DIDs",
-    unit="profiles",
+    title="Getting Bluesky users from handles or DIDs",
+    unit="users",
 )
 def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
@@ -44,7 +44,7 @@ def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     def work(users: Iterable[str]) -> Iterator[BlueskyProfile]:
         dids = mixed_handles_and_dids_to_dids(users)
-        return client.get_profiles(dids)
+        return client.users(dids)
 
     for (row, _), profile in outer_zip(
         enricher.cells(cli_args.column, with_rows=True),
@@ -58,8 +58,8 @@ def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
 @with_bluesky_fatal_errors
 @with_loading_bar(
-    title="Getting Bluesky profiles from handles or DIDs",
-    unit="profiles",
+    title="Getting Bluesky users from handles or DIDs",
+    unit="users",
 )
 def action_raw(cli_args, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
@@ -82,7 +82,7 @@ def action_raw(cli_args, loading_bar: LoadingBar):
                     raise e
 
     def work(dids: Iterable[str]) -> Iterator[str]:
-        return client.get_profiles(dids, return_raw=True)
+        return client.users(dids, return_raw=True)
 
     dids = mixed_handles_and_dids_to_dids(params)
 

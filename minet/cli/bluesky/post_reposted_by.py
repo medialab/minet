@@ -16,10 +16,10 @@ from minet.bluesky import BlueskyHTTPClient
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
     headers=PARTIAL_PROFILE_FIELDS,
-    title="Searching profiles",
-    unit="queries",
+    title="Getting list of reposts for Bluesky posts",
+    unit="posts",
     nested=True,
-    sub_unit="profiles",
+    sub_unit="users",
 )
 def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
@@ -29,9 +29,13 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     else:
         sub_total = None
 
-    for row, query in enricher.cells(cli_args.column, with_rows=True):
-        with loading_bar.step(query, sub_total=sub_total, count=cli_args.total):
-            for profile in islice(client.search_profiles(query), sub_total):
-                profile_row = format_partial_profile_as_csv_row(profile)
-                enricher.writerow(row, profile_row)
+    for row, param in enricher.cells(cli_args.column, with_rows=True):
+        if param.startswith("at://did:"):
+            uri = param
+        else:
+            uri = client.resolve_post_url(param)
+        with loading_bar.step(uri, sub_total=sub_total):
+            for profile in islice(client.post_reposted_by(uri), sub_total):
+                repost_row = format_partial_profile_as_csv_row(profile)
+                enricher.writerow(row, repost_row)
                 loading_bar.nested_advance()

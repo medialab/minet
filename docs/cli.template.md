@@ -26,15 +26,18 @@ _Generic commands_
 _Platform-related commands_
 
 - [bluesky (bsky)](#bluesky)
-  - [follows](#follows)
-  - [followers](#followers)
   - [posts](#posts)
-  - [profiles](#profiles)
-  - [user-posts](#user-posts)
-  - [resolve-post-url](#resolve-post-url)
+  - [post-liked-by](#post-liked-by)
+  - [post-quotes](#post-quotes)
+  - [post-reposted-by](#post-reposted-by)
   - [resolve-handle](#resolve-handle)
+  - [resolve-post-url](#resolve-post-url)
   - [search-posts](#search-posts)
   - [search-users](#search-users)
+  - [users](#users)
+  - [user-follows](#user-follows)
+  - [user-followers](#user-followers)
+  - [user-posts](#user-posts)
 
 - [facebook (fb)](#facebook)
   - [url-likes](#url-likes)
@@ -218,33 +221,29 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% bsky %>
 
-### follows
-
-<% bsky/follows %>
-
-### followers
-
-<% bsky/followers %>
-
 ### posts
 
 <% bsky/posts %>
 
-### profiles
+### post-liked-by
 
-<% bsky/profiles %>
+<% bsky/post-liked-by %>
 
-### user-posts
+### post-quotes
 
-<% bsky/user-posts %>
+<% bsky/post-quotes %>
 
-### resolve-post-url
+### post-reposted-by
 
-<% bsky/resolve-post-url %>
+<% bsky/post-reposted-by %>
 
 ### resolve-handle
 
 <% bsky/resolve-handle %>
+
+### resolve-post-url
+
+<% bsky/resolve-post-url %>
 
 ### search-posts
 
@@ -253,6 +252,22 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### search-users
 
 <% bsky/search-users %>
+
+### users
+
+<% bsky/users %>
+
+### user-follows
+
+<% bsky/user-follows %>
+
+### user-followers
+
+<% bsky/user-followers %>
+
+### user-posts
+
+<% bsky/user-posts %>
 
 ## Facebook
 

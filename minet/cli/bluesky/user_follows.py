@@ -2,8 +2,8 @@ from casanova import Enricher
 
 from itertools import islice
 
-from twitwi.bluesky.constants import POST_FIELDS
-from twitwi.bluesky import format_post_as_csv_row
+from twitwi.bluesky.constants import PARTIAL_PROFILE_FIELDS
+from twitwi.bluesky import format_partial_profile_as_csv_row
 
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.loading_bar import LoadingBar
@@ -15,11 +15,11 @@ from minet.bluesky import BlueskyHTTPClient
 
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=POST_FIELDS,
-    title="Getting posts",
+    headers=PARTIAL_PROFILE_FIELDS,
+    title="Getting Bluesky follows",
     unit="users",
     nested=True,
-    sub_unit="posts",
+    sub_unit="follows",
 )
 def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
@@ -29,11 +29,14 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
             did = client.resolve_handle(user)
         else:
             did = user
-        with loading_bar.step(did):
-            for post in islice(
-                client.user_posts(did),
-                int(cli_args.limit) if cli_args.limit else None,
-            ):
-                post_row = format_post_as_csv_row(post)
-                enricher.writerow(row, post_row)
+
+        if cli_args.limit:
+            sub_total = int(cli_args.limit)
+        else:
+            sub_total = next(client.users([did]))["follows"]
+
+        with loading_bar.step(did, sub_total=sub_total):
+            for follow in islice(client.user_follows(did), sub_total):
+                follow_row = format_partial_profile_as_csv_row(follow)
+                enricher.writerow(row, follow_row)
                 loading_bar.nested_advance()
