@@ -27,6 +27,7 @@ from minet.bluesky.urls import (
 from minet.bluesky.jwt import parse_jwt_for_expiration
 from minet.bluesky.exceptions import (
     BlueskyAuthenticationError,
+    BlueskyExpiredToken,
     BlueskySessionRefreshError,
     BlueskyBadRequestError,
     BlueskyUpstreamFailureError,
@@ -39,7 +40,7 @@ class BlueskyHTTPClient:
         self.urls = BlueskyHTTPAPIUrlFormatter()
         self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer(
-            additional_exceptions=[BlueskyUpstreamFailureError], retry_on_statuses=[502]
+            additional_exceptions=[BlueskyUpstreamFailureError, BlueskyExpiredToken], retry_on_statuses=[502]
         )
         self.rate_limit_reset: Optional[int] = None
 
@@ -123,8 +124,8 @@ class BlueskyHTTPClient:
                 # Somehow happens after 2 hours on a request (which worked fine before)
                 # It doesn't happen very often
                 if e == "ExpiredToken":
-                    raise BlueskyBadRequestError(
-                        f"The access token has expired and could not be refreshed. On url: {url} (HTTP {response.status})"
+                    raise BlueskyExpiredToken(
+                        f"{data['message']}. On url: {url} (HTTP {response.status})"
                     )
                 raise BlueskyBadRequestError(
                     f"HTTP {response.status} {e}: {data['message']}"
