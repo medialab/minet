@@ -118,7 +118,13 @@ class BlueskyHTTPClient:
                 e = data["error"]
                 if e == "UpstreamFailure":
                     raise BlueskyUpstreamFailureError(
-                        "Bluesky is currently experiencing upstream issues."
+                        f"Bluesky is currently experiencing upstream issues. (HTTP status {response.status})"
+                    )
+                # Somehow happens after 2 hours on a request (which worked fine before)
+                # It doesn't happen very often
+                if e == "ExpiredToken":
+                    raise BlueskyBadRequestError(
+                        f"The access token has expired and could not be refreshed. On url: {url} (HTTP {response.status})"
                     )
                 raise BlueskyBadRequestError(
                     f"HTTP {response.status} {e}: {data['message']}"
