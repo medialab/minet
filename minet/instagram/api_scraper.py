@@ -259,7 +259,11 @@ class InstagramAPIScraper(object):
         except JSONDecodeError:
             raise RuntimeError("HTML for the request to " + url + " : " + text)
 
-        if response.status == 429:
+        if response.status == 429 or (
+            response.status == 401
+            and "please wait a few minutes before you try again"
+            in data["message"].lower().strip()
+        ):
             raise InstagramTooManyRequestsError
 
         if response.status == 500:
