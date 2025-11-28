@@ -262,12 +262,12 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
         {
             "flag": "--since",
             "type": PartialISODatetimeType(True),
-            "help": "Filter results for posts after the indicated datetime (inclusive). Expected to use 'createdAt' timestamp, with a millisecond precision. Can be a datetime, or just an ISO date (YYYY-MM-DD, YYYY-MM-DDTHH, ..., YYYY-MM-DDTHH:mm:SSZ or YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to \"since:<date>\" in classic search syntax.",
+            "help": "Filter results for posts after the indicated datetime (inclusive). Expected to use 'createdAt' timestamp, with a millisecond precision. Can be a datetime, or just an ISO date (YYYY-MM-DD, YYYY-MM-DDTHH, ..., YYYY-MM-DDTHH:mm:SSZ or YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to \"since:<date>\" in classic search syntax, but the flag overwrites it when both are provided.",
         },
         {
             "flag": "--until",
             "type": PartialISODatetimeType(True),
-            "help": "Filter results for posts before the indicated datetime (NOT inclusive). Expected to use 'createdAt' timestamp, with a millisecond precision. Can be a datetime, or just an ISO date (YYYY-MM-DDTHH:mm:SSZ or YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to \"until:<date>\" in classic search syntax.",
+            "help": "Filter results for posts before the indicated datetime (NOT inclusive). Expected to use 'createdAt' timestamp, with a millisecond precision. Can be a datetime, or just an ISO date (YYYY-MM-DDTHH:mm:SSZ or YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to \"until:<date>\" in classic search syntax, but the flag overwrites it when both are provided.",
         },
         {
             "flag": "--mentions",
@@ -331,7 +331,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
 
         - After some tests, it seems that the posts returned by the Bluesky API are not always perfectly sorted by the local time we give (with millisecond precision). Indeed, this local time depends on the 'createdAt' field of the post, and we observed that in some cases, this value is artificial (cf their indexation code : https://github.com/bluesky-social/indigo/blob/c5eaa30f683f959af20ea17fdf390d8a22d471cd/search/transform.go#L225).
 
-        - The Bluesky search API seems to limit the number of results to 10,000 posts per query. To bypass this limitation, Minet pages the results using time ranges (with millisecond precision) when this limit is reached. However, due to this method, if there are more than 10,000 unique posts with the same datetime (with millisecond precision), we won't be able to get them all. Moreover, when reaching that limit and time paging, we noticed that Bluesky API doesn't return exactly the same 10,000 posts again: some new posts are found, but most are already seen, and most importantly it seems that there is no logic behind the order of these posts, meaning we are for now unable to ensure we retrieve the exact same posts when executing the same command multiple time... This issue is being investigated.
+        - The Bluesky search API seems to limit the number of results to 10,000 posts per query. To bypass this limitation, Minet pages the results using time ranges (with millisecond precision) when this limit is reached. However, due to this method, if there are more than 10,000 unique posts with the same datetime (with millisecond precision), we won't be able to get them all. Moreover, when reaching that limit and time paging, we noticed that Bluesky API doesn't return exactly the same 10,000 posts again: some new posts are found, but most are already seen, and most importantly it seems that there is no logic behind the order of these posts, meaning we are for now unable to ensure we retrieve the exact same posts when executing the same command multiple times... This issue is being investigated.
     """,
 )
 
