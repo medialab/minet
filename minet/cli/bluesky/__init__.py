@@ -42,7 +42,7 @@ BLUESKY_FOLLOWS_COMMAND = command(
     variadic_input={"dummy_column": "handle-or-did"},
     epilog="""
         Examples:
-        
+
         . Get follows of a user by their handle:
             $ minet bluesky follows @bsky.app
 
@@ -80,7 +80,7 @@ BLUESKY_FOLLOWERS_COMMAND = command(
     variadic_input={"dummy_column": "handle-or-did"},
     epilog="""
         Examples:
-        
+
         . Get followers of a user by their handle:
             $ minet bluesky followers @bsky.app
 
@@ -121,10 +121,10 @@ BLUESKY_POSTS_COMMAND = command(
 
         . Get a post from its URI:
             $ minet bluesky posts <uri>
-        
+
         . Get a post from its URL:
             $ minet bluesky posts <url>
-        
+
         . Get multiple posts from their URIs from a CSV file:
             $ minet bluesky posts <uri-column> -i posts.csv
 
@@ -152,7 +152,7 @@ BLUESKY_PROFILES_COMMAND = command(
     variadic_input={"dummy_column": "handle-or-did"},
     epilog="""
         Examples:
-        
+
         . Get profile from a user by their handle:
             $ minet bluesky profiles @bsky.app
 
@@ -186,13 +186,13 @@ BLUESKY_USER_POSTS_COMMAND = command(
     ],
     epilog="""
         Examples:
-        
+
         . Get posts from a user by their handle:
             $ minet bluesky user-posts @bsky.app
-        
+
         . Get 150 last posts from a user by their DID:
             $ minet bluesky user-posts did:plc:z72i7hdynmk6r22z27h6tvur --limit 150
-        
+
         . Get posts from users by their handles from a CSV file:
             $ minet bluesky user-posts <handle-column> -i users.csv
 
@@ -213,7 +213,7 @@ BLUESKY_RESOLVE_POST_URL_COMMAND = command(
     variadic_input={"dummy_column": "url"},
     epilog="""
         Examples:
-        
+
         . Get a post URI from its URL:
             $ minet bluesky resolve-post-url <url>
 
@@ -236,7 +236,7 @@ BLUESKY_RESOLVE_HANDLE_COMMAND = command(
 
         . Get a user DID from their handle:
             $ minet bluesky resolve-handle @bsky.app
-        
+
         . Get multiple user DIDs from their handles from a CSV file:
             $ minet bluesky resolve-handle <handle-column> -i users.csv
 
@@ -290,17 +290,27 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
             "type": int,
             "help": "Limit the number of posts to retrieve for each query.",
         },
+        {
+            "flag": "--passwords",
+            "type": str,
+            "help": "Comma-separated list of Bluesky app passwords (not your personal password, must be created here: https://bsky.app/settings/app-passwords) to use for multithreaded requests.",
+        },
+        {
+            "flag": "--subqueries",
+            "type": int,
+            "help": "To use with --passwords. Number of subqueries to generate from all queries to better parallelize the searches when using multiple passwords. Each subquery will add additional filters to the original query to split the search space (i.e. by date ranges). Default to twice the number of passwords provided. The greater it is, the faster the searches will be.",
+        },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
     epilog="""
         Examples:
-        
+
         . Collect last 500 posts containing the word "new" until 2024-01-01 at 16:15 UTC:
             $ minet bsky search-posts "new" --until 2024-01-01T16:15 --limit 500 > posts.csv
 
         . Collect the posts containing the word "new" mentionning user "alice.bsky.social" since 2025-01-01:
             $ minet bsky search-posts "new" --mentions alice.bsky.social --since 2025-01-01 > posts.csv
-        
+
         . Collect the posts containing the tag '#bluesky' in Spanish:
             $ minet bsky search-posts "#bluesky" -l es > posts.csv
 
@@ -319,7 +329,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
         - To filter posts without given keywords, use the minus syntax, e.g. "-twitter" in the query. Multiple keywords can be specified, with 'AND' matching.
 
         Warning:
-        
+
         - After some tests, it seems that the posts returned by the Bluesky API are not always perfectly sorted by the local time we give (with millisecond precision). Indeed, this local time depends on the 'createdAt' field of the post, and we observed that in some cases, this value is artificial (cf their indexation code : https://github.com/bluesky-social/indigo/blob/c5eaa30f683f959af20ea17fdf390d8a22d471cd/search/transform.go#L225).
     """,
 )
