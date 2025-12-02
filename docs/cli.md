@@ -5427,7 +5427,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [--silent]
                                        [--refresh-per-second REFRESH_PER_SECOND]
-                                       [--simple-progress] [-i INPUT]
+                                       [--simple-progress] [--desc] [-i INPUT]
                                        [--explode EXPLODE] [-s SELECT]
                                        [--total TOTAL] [-o OUTPUT]
                                        channel_name_or_channel_name_column
@@ -5443,6 +5443,8 @@ Positional Arguments:
                                 when using -i/--input.
 
 Optional Arguments:
+  --desc                        Whether to collect data in reverse chronological
+                                order instead of default chronological order.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5552,7 +5554,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                today.
+                                `2025-12-02`.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `2022-10-01`.
   --secret SECRET               Tiktok API identification secret. Can also be
@@ -5610,7 +5612,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                today.
+                                `20251201`.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `20221001`.
   --secret SECRET               Tiktok API identification secret. Can also be

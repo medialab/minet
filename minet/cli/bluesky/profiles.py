@@ -29,7 +29,9 @@ from minet.bluesky.exceptions import BlueskyHandleNotFound
 def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
-    def mixed_handles_and_dids_to_dids(profiles: Iterable[str]) -> Iterator[Optional[str]]:
+    def mixed_handles_and_dids_to_dids(
+        profiles: Iterable[str],
+    ) -> Iterator[Optional[str]]:
         for profile in profiles:
             if profile.startswith("did:"):
                 yield profile
@@ -69,7 +71,9 @@ def action_raw(cli_args, loading_bar: LoadingBar):
 
     params = reader.cells(cli_args.column, with_rows=False)
 
-    def mixed_handles_and_dids_to_dids(profiles: Iterable[str]) -> Iterator[Optional[str]]:
+    def mixed_handles_and_dids_to_dids(
+        profiles: Iterable[str],
+    ) -> Iterator[Optional[str]]:
         for profile in profiles:
             if profile.startswith("did:"):
                 yield profile

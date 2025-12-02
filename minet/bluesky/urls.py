@@ -40,7 +40,9 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
     def refresh_session(self) -> str:
         return self.format(path="com.atproto.server.refreshSession")
 
-    def post_liked_by(self, post_uri: str, cursor: Optional[str] = None, limit: int = 100) -> str:
+    def post_liked_by(
+        self, post_uri: str, cursor: Optional[str] = None, limit: int = 100
+    ) -> str:
         return self.format(
             path="app.bsky.feed.getLikes",
             args={"uri": post_uri, "cursor": cursor, "limit": limit},
