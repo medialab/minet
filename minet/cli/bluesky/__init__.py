@@ -24,33 +24,33 @@ BLUESKY_FIREHOSE_COMMAND = command(
     """,
 )
 
-BLUESKY_USER_FOLLOWS_COMMAND = command(
-    "user-follows",
-    "minet.cli.bluesky.user_follows",
+BLUESKY_PROFILE_FOLLOWS_COMMAND = command(
+    "profile-follows",
+    "minet.cli.bluesky.profile_follows",
     title="Minet Bluesky Get Follows from Handle or DID command",
     description="""
-        Get whether follows of a user giving its handle or DID or respective follows of several users given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
+        Get whether follows of a profile giving its handle or DID or respective follows of several profiles given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
     """,
     arguments=[
         {
             "flags": ["-l", "--limit"],
             "type": int,
-            "help": "Limit the number of follows to retrieve for each user. Will collect all follows by default.",
+            "help": "Limit the number of follows to retrieve for each profile. Will collect all follows by default.",
         },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
-    variadic_input={"dummy_column": "user"},
+    variadic_input={"dummy_column": "profile"},
     epilog="""
         Examples:
 
-        . Get follows of a user by their handle:
-            $ minet bluesky user-follows @bsky.app
+        . Get follows of a profile by their handle:
+            $ minet bluesky profile-follows @bsky.app
 
-        . Get 100 follows of a user by their DID:
-            $ minet bluesky user-follows did:plc:z72i7hdynmk6r22z27h6tvur --limit 100
+        . Get 100 follows of a profile by their DID:
+            $ minet bluesky profile-follows did:plc:z72i7hdynmk6r22z27h6tvur --limit 100
 
-        . Get follows from users by their handles from a CSV file:
-            $ minet bluesky user-follows <handle-column> -i users.csv
+        . Get follows from profiles by their handles from a CSV file:
+            $ minet bluesky profile-follows <handle-column> -i profiles.csv
 
         Tips:
 
@@ -58,37 +58,37 @@ BLUESKY_USER_FOLLOWS_COMMAND = command(
 
         Note:
 
-        - This command returns partial user profiles, which can be completed by using the `minet bluesky users` command.
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
     """,
 )
 
-BLUESKY_USER_FOLLOWERS_COMMAND = command(
-    "user-followers",
-    "minet.cli.bluesky.user_followers",
+BLUESKY_PROFILE_FOLLOWERS_COMMAND = command(
+    "profile-followers",
+    "minet.cli.bluesky.profile_followers",
     title="Minet Bluesky Get Followers from Handle or DID command",
     description="""
-        Get whether followers of a user giving its handle or DID or respective followers of several users given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
+        Get whether followers of a profile giving its handle or DID or respective followers of several profiles given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
     """,
     arguments=[
         {
             "flags": ["-l", "--limit"],
             "type": int,
-            "help": "Limit the number of followers to retrieve for each user. Will collect all followers by default.",
+            "help": "Limit the number of followers to retrieve for each profile. Will collect all followers by default.",
         },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
-    variadic_input={"dummy_column": "user"},
+    variadic_input={"dummy_column": "profile"},
     epilog="""
         Examples:
 
-        . Get followers of a user by their handle:
-            $ minet bluesky user-followers @bsky.app
+        . Get followers of a profile by their handle:
+            $ minet bluesky profile-followers @bsky.app
 
-        . Get 100 followers of a user by their DID:
-            $ minet bluesky user-followers did:plc:z72i7hdynmk6r22z27h6tvur --limit 100
+        . Get 100 followers of a profile by their DID:
+            $ minet bluesky profile-followers did:plc:z72i7hdynmk6r22z27h6tvur --limit 100
 
-        . Get followers from users by their handles from a CSV file:
-            $ minet bluesky user-followers <handle-column> -i users.csv
+        . Get followers from profiles by their handles from a CSV file:
+            $ minet bluesky profile-followers <handle-column> -i profiles.csv
 
         Tips:
 
@@ -96,7 +96,7 @@ BLUESKY_USER_FOLLOWERS_COMMAND = command(
 
         Note:
 
-        - This command returns partial user profiles, which can be completed by using the `minet bluesky users` command.
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
     """,
 )
 
@@ -134,12 +134,12 @@ BLUESKY_POSTS_COMMAND = command(
     """,
 )
 
-BLUESKY_USERS_COMMAND = command(
-    "users",
-    "minet.cli.bluesky.users",
-    title="Minet Bluesky Get User from Handle or DID command",
+BLUESKY_PROFILES_COMMAND = command(
+    "profiles",
+    "minet.cli.bluesky.profiles",
+    title="Minet Bluesky Get Profile from Handle or DID command",
     description="""
-        Get whether a Bluesky user given the user handle or DID or multiple Bluesky users given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
+        Get whether a Bluesky profile given the profile handle or DID or multiple Bluesky profiles given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
     """,
     arguments=[
         {
@@ -149,18 +149,18 @@ BLUESKY_USERS_COMMAND = command(
         },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
-    variadic_input={"dummy_column": "user"},
+    variadic_input={"dummy_column": "profile"},
     epilog="""
         Examples:
 
-        . Get user profile by their handle:
-            $ minet bluesky users @bsky.app
+        . Get profile by their handle:
+            $ minet bluesky profiles @bsky.app
 
-        . Get user profile by their DID:
-            $ minet bluesky users did:plc:z72i7hdynmk6r22z27h6tvur
+        . Get profile by their DID:
+            $ minet bluesky profiles did:plc:z72i7hdynmk6r22z27h6tvur
 
-        . Get user profiles by their handles from a CSV file:
-            $ minet bluesky users <handle-column> -i users.csv
+        . Get profiles by their handles from a CSV file:
+            $ minet bluesky profiles <handle-column> -i profiles.csv
 
         Tips:
 
@@ -199,33 +199,33 @@ BLUESKY_POST_QUOTES_COMMAND = command(
 """,
 )
 
-BLUESKY_USER_POSTS_COMMAND = command(
-    "user-posts",
-    "minet.cli.bluesky.user_posts",
-    title="Minet Bluesky Get User Posts command",
+BLUESKY_PROFILE_POSTS_COMMAND = command(
+    "profile-posts",
+    "minet.cli.bluesky.profile_posts",
+    title="Minet Bluesky Get Profile Posts command",
     description="""
-        Retrieves Bluesky posts whether by user using its handle (e.g. @bsky.app) or DID (did:...) or multiple users given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
+        Retrieves Bluesky posts whether by profile using its handle (e.g. @bsky.app) or DID (did:...) or multiple profiles given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
     """,
-    variadic_input={"dummy_column": "user"},
+    variadic_input={"dummy_column": "profile"},
     arguments=[
         {
             "flags": ["-l", "--limit"],
             "type": int,
-            "help": "Limit the number of posts to retrieve for each user. Will collect all posts by default.",
+            "help": "Limit the number of posts to retrieve for each profile. Will collect all posts by default.",
         },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
     epilog="""
         Examples:
 
-        . Get posts from a user by their handle:
-            $ minet bluesky user-posts @bsky.app
+        . Get posts from a profile by their handle:
+            $ minet bluesky profile-posts @bsky.app
 
-        . Get 150 last posts from a user by their DID:
-            $ minet bluesky user-posts did:plc:z72i7hdynmk6r22z27h6tvur --limit 150
+        . Get 150 last posts from a profile by their DID:
+            $ minet bluesky profile-posts did:plc:z72i7hdynmk6r22z27h6tvur --limit 150
 
-        . Get posts from users by their handles from a CSV file:
-            $ minet bluesky user-posts <handle-column> -i users.csv
+        . Get posts from profiles by their handles from a CSV file:
+            $ minet bluesky profile-posts <handle-column> -i profiles.csv
 
         Tips:
 
@@ -238,13 +238,13 @@ BLUESKY_POST_LIKED_BY_COMMAND = command(
     "minet.cli.bluesky.post_liked_by",
     title="Minet Bluesky Get Liked By from URL or URI command",
     description="""
-        Get user who liked whether a post giving its URL or URI or several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
+        Get profile who liked whether a post giving its URL or URI or several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
     """,
     arguments=[
         {
             "flags": ["-l", "--limit"],
             "type": int,
-            "help": "Limit the number of users to retrieve for each post. Will collect all users by default.",
+            "help": "Limit the number of profiles to retrieve for each post. Will collect all profiles by default.",
         },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
@@ -252,18 +252,18 @@ BLUESKY_POST_LIKED_BY_COMMAND = command(
     epilog="""
         Examples:
 
-        . Get users who liked a post from the post's URL:
+        . Get profiles who liked a post from the post's URL:
             $ minet bluesky post-liked-by <post-url>
 
-        . Get 100 users who liked a post from the post's URI:
+        . Get 100 profiles who liked a post from the post's URI:
             $ minet bluesky post-liked-by <post-uri> --limit 100
 
-        . Get users who liked a post from post URLs from a CSV file:
+        . Get profiles who liked a post from post URLs from a CSV file:
             $ minet bluesky post-liked-by <url-column> -i posts.csv
 
         Note:
 
-        - This command returns partial user profiles, which can be completed by using the `minet bluesky users` command.
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
     """,
 )
 
@@ -272,13 +272,13 @@ BLUESKY_POST_REPOSTED_BY_COMMAND = command(
     "minet.cli.bluesky.post_reposted_by",
     title="Minet Bluesky Get Reposted By from URL or URI command",
     description="""
-        Get user who reposted whether a post giving its URL or URI or several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
+        Get profile who reposted whether a post giving its URL or URI or several posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
     """,
     arguments=[
         {
             "flags": ["-l", "--limit"],
             "type": int,
-            "help": "Limit the number of users to retrieve for each post. Will collect all users by default.",
+            "help": "Limit the number of profiles to retrieve for each post. Will collect all profiles by default.",
         },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
@@ -286,18 +286,18 @@ BLUESKY_POST_REPOSTED_BY_COMMAND = command(
     epilog="""
         Examples:
 
-        . Get users who reposted a post from the post's URL:
+        . Get profiles who reposted a post from the post's URL:
             $ minet bluesky post-reposted-by <post-url>
 
-        . Get 100 users who reposted a post from the post's URI:
+        . Get 100 profiles who reposted a post from the post's URI:
             $ minet bluesky post-reposted-by <post-uri> --limit 100
 
-        . Get users who reposted a post from post URLs from a CSV file:
+        . Get profiles who reposted a post from post URLs from a CSV file:
             $ minet bluesky post-reposted-by <url-column> -i posts.csv
 
         Note:
 
-        - This command returns partial user profiles, which can be completed by using the `minet bluesky users` command.
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
     """,
 )
 
@@ -333,11 +333,11 @@ BLUESKY_RESOLVE_HANDLE_COMMAND = command(
     epilog="""
         Examples:
 
-        . Get a user DID from their handle:
+        . Get a profile DID from their handle:
             $ minet bluesky resolve-handle @bsky.app
 
-        . Get multiple user DIDs from their handles from a CSV file:
-            $ minet bluesky resolve-handle <handle-column> -i users.csv
+        . Get multiple profile DIDs from their handles from a CSV file:
+            $ minet bluesky resolve-handle <handle-column> -i profiles.csv
 
         Tips:
 
@@ -397,7 +397,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
         . Collect last 500 posts containing the word "new" until 2024-01-01 at 16:15 UTC:
             $ minet bsky search-posts "new" --until 2024-01-01T16:15 --limit 500 > posts.csv
 
-        . Collect the posts containing the word "new" mentionning user "alice.bsky.social" since 2025-01-01:
+        . Collect the posts containing the word "new" mentionning profile "alice.bsky.social" since 2025-01-01:
             $ minet bsky search-posts "new" --mentions alice.bsky.social --since 2025-01-01 > posts.csv
 
         . Collect the posts containing the tag '#bluesky' in Spanish:
@@ -423,37 +423,37 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
     """,
 )
 
-BLUESKY_SEARCH_USERS_COMMAND = command(
-    "search-users",
-    "minet.cli.bluesky.search_users",
-    title="Minet Bluesky Search Users command",
+BLUESKY_SEARCH_PROFILES_COMMAND = command(
+    "search-profiles",
+    "minet.cli.bluesky.search_profiles",
+    title="Minet Bluesky Search Profiles command",
     description="""
-        Search for whether Bluesky users matching a query or multiple Bluesky users matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API. A user matches a query if the user's name, handle or bio matches the query. This command is equivalent to the classic search on Bluesky when filtering by 'People'.
+        Search for whether Bluesky profiles matching a query or multiple Bluesky profiles matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API. A profile matches a query if the profile's name, handle or bio matches the query. This command is equivalent to the classic search on Bluesky when filtering by 'People'.
     """,
     variadic_input={"dummy_column": "query"},
     arguments=[
         {
             "flags": ["-l", "--limit"],
             "type": int,
-            "help": "Limit the number of users to retrieve for each query. Will collect all users by default.",
+            "help": "Limit the number of profiles to retrieve for each query. Will collect all profiles by default.",
         },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
     epilog="""
         Examples:
 
-        . Search user by its handle:
-            $ minet bluesky search-users @bsky.app
+        . Search profile by its handle:
+            $ minet bluesky search-profiles @bsky.app
 
-        . Get 150 users from matching a query:
-            $ minet bluesky search-users <query> --limit 150
+        . Get 150 profiles from matching a query:
+            $ minet bluesky search-profiles <query> --limit 150
 
-        . Get users from a CSV file:
-            $ minet bluesky search-users <query-column> -i queries.csv
+        . Get profiles from a CSV file:
+            $ minet bluesky search-profiles <query-column> -i queries.csv
 
         Note:
 
-        - This command returns partial user profiles, which can be completed by using the `minet bluesky users` command.
+        - This command returns partial user profiles, which can be completed by using the `minet bluesky profiles` command.
 
     """,
 )
@@ -475,10 +475,10 @@ BLUESKY_COMMAND = command(
         BLUESKY_RESOLVE_HANDLE_COMMAND,
         BLUESKY_RESOLVE_POST_URL_COMMAND,
         BLUESKY_SEARCH_POSTS_COMMAND,
-        BLUESKY_SEARCH_USERS_COMMAND,
-        BLUESKY_USERS_COMMAND,
-        BLUESKY_USER_FOLLOWERS_COMMAND,
-        BLUESKY_USER_FOLLOWS_COMMAND,
-        BLUESKY_USER_POSTS_COMMAND,
+        BLUESKY_SEARCH_PROFILES_COMMAND,
+        BLUESKY_PROFILES_COMMAND,
+        BLUESKY_PROFILE_FOLLOWERS_COMMAND,
+        BLUESKY_PROFILE_FOLLOWS_COMMAND,
+        BLUESKY_PROFILE_POSTS_COMMAND,
     ],
 )

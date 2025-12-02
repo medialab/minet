@@ -266,10 +266,10 @@ class BlueskyHTTPClient:
             if not oldest_uris_len_changed and not oldest_date_changed:
                 break
 
-    def search_users(self, query: str) -> Iterator[BlueskyPartialProfile]:
+    def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
         while True:
-            url = self.urls.search_users(query, cursor=cursor)
+            url = self.urls.search_profiles(query, cursor=cursor)
 
             response = self.request(url)
             data = response.json()
@@ -341,12 +341,11 @@ class BlueskyHTTPClient:
 
         return format_post_at_uri(did, rkey)
 
-    def user_follows(self, did: str) -> Iterator[BlueskyPartialProfile]:
+    def profile_follows(self, did: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
         while True:
-            url = self.urls.user_follows(did, cursor=cursor)
-
+            url = self.urls.profile_follows(did, cursor=cursor)
             response = self.request(url)
             data = response.json()
 
@@ -358,12 +357,11 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
-    def user_followers(self, did: str) -> Iterator[BlueskyPartialProfile]:
+    def profile_followers(self, did: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
         while True:
-            url = self.urls.user_followers(did, cursor=cursor)
-
+            url = self.urls.profile_followers(did, cursor=cursor)
             response = self.request(url)
             data = response.json()
 
@@ -399,12 +397,11 @@ class BlueskyHTTPClient:
                 # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post_data)
 
-    def user_posts(self, did: str) -> Iterator[BlueskyPost]:
+    def profile_posts(self, did: str) -> Iterator[BlueskyPost]:
         cursor = None
 
         while True:
-            url = self.urls.user_posts(did, cursor=cursor)
-
+            url = self.urls.profile_posts(did, cursor=cursor)
             response = self.request(url)
             data = response.json()
 
@@ -418,11 +415,11 @@ class BlueskyHTTPClient:
                 break
 
     # NOTE: does this need to accept Optional[str]?
-    def users(
+    def profiles(
         self, identifiers: Iterable[Optional[str]], return_raw=False
     ) -> Iterator[Optional[Union[BlueskyProfile, Dict]]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
-            url = self.urls.users(chunk)
+            url = self.urls.profiles(chunk)
             response = self.request(url)
             data = response.json()
 

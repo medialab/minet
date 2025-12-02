@@ -16,10 +16,10 @@ from minet.bluesky import BlueskyHTTPClient
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
     headers=PARTIAL_PROFILE_FIELDS,
-    title="Searching users",
+    title="Searching profiles",
     unit="queries",
     nested=True,
-    sub_unit="users",
+    sub_unit="profiles",
 )
 def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
@@ -31,7 +31,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(query, sub_total=sub_total, count=cli_args.total):
-            for profile in islice(client.search_users(query), sub_total):
+            for profile in islice(client.search_profiles(query), sub_total):
                 profile_row = format_partial_profile_as_csv_row(profile)
                 enricher.writerow(row, profile_row)
                 loading_bar.nested_advance()

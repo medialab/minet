@@ -65,7 +65,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"handle": handle},
         )
 
-    def user_follows(
+    def profile_follows(
         self, did: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -73,7 +73,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"actor": did, "cursor": cursor, "limit": limit},
         )
 
-    def user_followers(
+    def profile_followers(
         self, did: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -86,7 +86,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             path="app.bsky.feed.getPosts", args=[("uris", uri) for uri in uris]
         )
 
-    def users(self, identifiers: List[str]) -> str:
+    def profiles(self, identifiers: List[str]) -> str:
         return self.format(
             path="app.bsky.actor.getProfiles",
             args=[("actors", identifier) for identifier in identifiers],
@@ -125,7 +125,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args=args,
         )
 
-    def search_users(
+    def search_profiles(
         self, query: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -133,7 +133,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"term": query, "cursor": cursor, "limit": limit},
         )
 
-    def user_posts(
+    def profile_posts(
         self,
         identifier: str,
         cursor: Optional[str] = None,

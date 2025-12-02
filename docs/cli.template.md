@@ -33,11 +33,11 @@ _Platform-related commands_
   - [resolve-handle](#resolve-handle)
   - [resolve-post-url](#resolve-post-url)
   - [search-posts](#search-posts)
-  - [search-users](#search-users)
-  - [users](#users)
-  - [user-follows](#user-follows)
-  - [user-followers](#user-followers)
-  - [user-posts](#user-posts)
+  - [search-profiles](#search-profiles)
+  - [profiles](#profiles)
+  - [profile-follows](#profile-follows)
+  - [profile-followers](#profile-followers)
+  - [profile-posts](#profile-posts)
 
 - [facebook (fb)](#facebook)
   - [url-likes](#url-likes)
@@ -249,25 +249,25 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% bsky/search-posts %>
 
-### search-users
+### search-profiles
 
-<% bsky/search-users %>
+<% bsky/search-profiles %>
 
-### users
+### profiles
 
-<% bsky/users %>
+<% bsky/profiles %>
 
-### user-follows
+### profile-follows
 
-<% bsky/user-follows %>
+<% bsky/profile-follows %>
 
-### user-followers
+### profile-followers
 
-<% bsky/user-followers %>
+<% bsky/profile-followers %>
 
-### user-posts
+### profile-posts
 
-<% bsky/user-posts %>
+<% bsky/profile-posts %>
 
 ## Facebook
 
