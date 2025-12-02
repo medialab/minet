@@ -29,22 +29,22 @@ from minet.bluesky.exceptions import BlueskyHandleNotFound
 def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
-    def mixed_handles_and_dids_to_dids(users: Iterable[str]) -> Iterator[Optional[str]]:
-        for user in users:
-            if user.startswith("did:"):
-                yield user
+    def mixed_handles_and_dids_to_dids(profiles: Iterable[str]) -> Iterator[Optional[str]]:
+        for profile in profiles:
+            if profile.startswith("did:"):
+                yield profile
             else:
                 try:
-                    yield client.resolve_handle(user, True)
+                    yield client.resolve_handle(profile, True)
                 except BlueskyHandleNotFound:
-                    # in case the user does not exist
+                    # in case the profile does not exist
                     yield None
                 except Exception as e:
                     raise e
 
-    def work(users: Iterable[str]) -> Iterator[BlueskyProfile]:
-        dids = mixed_handles_and_dids_to_dids(users)
-        return client.get_profiles(dids)
+    def work(profiles: Iterable[str]) -> Iterator[BlueskyProfile]:
+        dids = mixed_handles_and_dids_to_dids(profiles)
+        return client.profiles(dids)
 
     for (row, _), profile in outer_zip(
         enricher.cells(cli_args.column, with_rows=True),
@@ -69,20 +69,20 @@ def action_raw(cli_args, loading_bar: LoadingBar):
 
     params = reader.cells(cli_args.column, with_rows=False)
 
-    def mixed_handles_and_dids_to_dids(users: Iterable[str]) -> Iterator[Optional[str]]:
-        for user in users:
-            if user.startswith("did:"):
-                yield user
+    def mixed_handles_and_dids_to_dids(profiles: Iterable[str]) -> Iterator[Optional[str]]:
+        for profile in profiles:
+            if profile.startswith("did:"):
+                yield profile
             else:
                 try:
-                    yield client.resolve_handle(user, True)
-                except KeyError:  # in case the user does not exist
+                    yield client.resolve_handle(profile, True)
+                except KeyError:  # in case the profile does not exist
                     yield None
                 except Exception as e:
                     raise e
 
     def work(dids: Iterable[str]) -> Iterator[str]:
-        return client.get_profiles(dids, return_raw=True)
+        return client.profiles(dids, return_raw=True)
 
     dids = mixed_handles_and_dids_to_dids(params)
 
