@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.2.1
+
+*Fixes*
+
+- Fixing CI
+
 ## 4.2.0
 
 *Features*
