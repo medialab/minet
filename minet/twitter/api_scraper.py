@@ -1029,3 +1029,12 @@ class TwitterUnauthenticatedAPIScraper:
         data = self.request(url).json()
 
         return data
+
+    def get_normalized_tweet(self, tweet_id: str, locale=None, source_version: str = "v1"):
+        raw_tweet = self.get_tweet(tweet_id, locale=locale)
+        normalized_tweet = normalize_tweet(
+            raw_tweet,
+            locale=locale,
+            source_version=source_version,
+        )
+        return normalized_tweet

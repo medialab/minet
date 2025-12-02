@@ -598,6 +598,11 @@ TWITTER_TWEETS_SUBCOMMAND = command(
             "help": "Bypass confirmation.",
             "action": "store_true",
         },
+        {
+            "flag": "--unlogged",
+            "help": "Whether to use an unauthenticated scraping mode (might be more limited).",
+            "action": "store_true",
+        }
     ],
 )
 
