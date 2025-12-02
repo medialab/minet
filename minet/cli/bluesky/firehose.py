@@ -1,43 +1,92 @@
-import libipld
-import time
+
+import asyncio
+import websockets
+import json
+
+# import libipld
+# import time
 
 from minet.cli.console import console
 
-from minet.bluesky.websocket_client import BlueskyWebSocketClient
+# from minet.bluesky.websocket_client import BlueskyWebSocketClient
+
+# List of public Bluesky Jetstream instances (c.f. https://docs.bsky.app/blog/jetstream)
+bsky_jetstream_public_instances = [
+    "jetstream1.us-east.bsky.network",
+    "jetstream2.us-east.bsky.network",
+    "jetstream1.eu-west.bsky.network",
+    "jetstream2.eu-west.bsky.network",
+]
+
+# JetStream doc
+# https://github.com/bluesky-social/jetstream#
+
+uri = "wss://" + bsky_jetstream_public_instances[1] + "/subscribe?wantedCollections=app.bsky.feed.post&author=evancheval.bsky.social"
+
+# It seems that the cursor param can be used to start from a given timestamp
+# (in microseconds since epoch) only up to one day in the past
+# uri = "wss://" + bsky_jetstream_public_instances[1] + "/subscribe?wantedCollections=app.bsky.feed.post&cursor=1733111630000000"
 
 
 def action(_):
-    client = BlueskyWebSocketClient()
+    # client = BlueskyWebSocketClient()
 
-    with client.subscribe_repos() as socket:
-        start = time.time()
-        countingposts = 0
-        while True:
-            payload = socket.recv()
-            header, body = libipld.decode_dag_cbor_multi(payload)  # type: ignore
-            # console.print(header, highlight=True)
-            body = dict(body)
-            if not body.get("repo"):
-                continue
-            did = body["repo"]
-            if not body.get("ops"):
-                continue
-            path = body["ops"][0]["path"].split("/")
-            if path[0] == "app.bsky.feed.post":
-                post_id = path[-1]
-                countingposts += 1
-                if countingposts % 1000 == 0:
-                    elapsed = time.time() - start
-                    console.print(
-                        f"Collected {countingposts} posts in {elapsed:.2f} seconds ({countingposts/elapsed:.2f} posts/sec)",
-                        highlight=True,
-                    )
-                # console.print(f"Post found: https://bsky.app/profile/{did}/post/{post_id}", highlight=True)
-            elif any(p in path[0] for p in
-                     ["feed.like", "feed.repost", "graph.follow", "feed.threadgate", "feed.postgate", "graph.list", "graph.listblock" ,"graph.block", "graph.starterpack", "graph.listitem", "actor.status", "actor.profile", "actor.declaration", "notification.declaration", "feed.generator"]):
-                continue
-            elif "bsky" in path[0]:
-                console.print(path[0], highlight=True)
+    # with client.subscribe_repos() as socket:
+    #     start = time.time()
+    #     countingposts = 0
+    #     while True:
+    #         payload = socket.recv()
+    #         header, body = libipld.decode_dag_cbor_multi(payload)  # type: ignore
+    #         # console.print(header, highlight=True)
+    #         body = dict(body)
+    #         blocks = body.get("blocks", None)
+    #         if blocks:
+    #             console.print(libipld.decode_car(blocks), highlight=True)
+    #         if not body.get("repo"):
+    #             continue
+    #         did = body["repo"]
+    #         if not body.get("ops"):
+    #             continue
+    #         path = body["ops"][0]["path"].split("/")
+    #         if path[0] == "app.bsky.feed.post":
+    #             post_id = path[-1]
+    #             countingposts += 1
+    #             if countingposts % 1000 == 0:
+    #                 elapsed = time.time() - start
+    #                 console.print(
+    #                     f"Collected {countingposts} posts in {elapsed:.2f} seconds ({countingposts/elapsed:.2f} posts/sec)",
+    #                     highlight=True,
+    #                 )
+    #             # console.print(f"Post found: https://bsky.app/profile/{did}/post/{post_id}", highlight=True)
+    #         elif any(p in path[0] for p in
+    #                  ["feed.like", "feed.repost", "graph.follow", "feed.threadgate", "feed.postgate", "graph.list", "graph.listblock" ,"graph.block", "graph.starterpack", "graph.listitem", "actor.status", "actor.profile", "actor.declaration", "notification.declaration", "feed.generator"]):
+    #             continue
+    #         elif "bsky" in path[0]:
+    #             console.print(path[0], highlight=True)
+
+    async def listen_to_websocket():
+        async with websockets.connect(uri) as websocket:
+            while True:
+                try:
+                    message = await websocket.recv()
+                    message = json.loads(message)
+                    if not message.get("commit"):
+                        # Skipping creation of accounts messages
+                        if message.get("kind").lower().strip() in ["identity", "account"]:
+                            continue
+                        console.print(message, highlight=True)
+                        continue
+                    url = f"https://bsky.app/profile/{message['did']}/post/{message['commit']['rkey']}"
+                    console.print(url, highlight=True)
+                    console.print(message, highlight=True)
+                    print(url)
+                except websockets.ConnectionClosed as e:
+                    console.print(f"Connection closed: {e}", highlight=True)
+                    break
+                except Exception as e:
+                    console.print(f"Error: {e}", highlight=True)
+
+    asyncio.get_event_loop().run_until_complete(listen_to_websocket())
 
 
 # returning this (url of the post: https://bsky.app/profile/did:plc:vuomqwhe7674a3ga6ofatcku/post/3m6wn6bjmnk2m):
