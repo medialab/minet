@@ -29,8 +29,32 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             path="com.atproto.server.createSession",
         )
 
+    def post_quotes(
+        self, post_uri: str, cursor: Optional[str] = None, limit: int = 100
+    ) -> str:
+        return self.format(
+            path="app.bsky.feed.getQuotes",
+            args={"uri": post_uri, "cursor": cursor, "limit": limit},
+        )
+
     def refresh_session(self) -> str:
         return self.format(path="com.atproto.server.refreshSession")
+
+    def post_liked_by(
+        self, post_uri: str, cursor: Optional[str] = None, limit: int = 100
+    ) -> str:
+        return self.format(
+            path="app.bsky.feed.getLikes",
+            args={"uri": post_uri, "cursor": cursor, "limit": limit},
+        )
+
+    def post_reposted_by(
+        self, post_uri: str, cursor: Optional[str] = None, limit: int = 100
+    ) -> str:
+        return self.format(
+            path="app.bsky.feed.getRepostedBy",
+            args={"uri": post_uri, "cursor": cursor, "limit": limit},
+        )
 
     def resolve_handle(self, handle: str, _alternate_api=False) -> str:
         # Handles resolving of special handles based on a different DNS do not work on the regular API, we need to use the alternate endpoint from the public facing API
@@ -43,7 +67,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"handle": handle},
         )
 
-    def get_follows(
+    def profile_follows(
         self, did: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -51,7 +75,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"actor": did, "cursor": cursor, "limit": limit},
         )
 
-    def get_followers(
+    def profile_followers(
         self, did: str, cursor: Optional[str] = None, limit: int = 100
     ) -> str:
         return self.format(
@@ -59,12 +83,12 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"actor": did, "cursor": cursor, "limit": limit},
         )
 
-    def get_posts(self, uris: List[str]) -> str:
+    def posts(self, uris: List[str]) -> str:
         return self.format(
             path="app.bsky.feed.getPosts", args=[("uris", uri) for uri in uris]
         )
 
-    def get_profiles(self, identifiers: List[str]) -> str:
+    def profiles(self, identifiers: List[str]) -> str:
         return self.format(
             path="app.bsky.actor.getProfiles",
             args=[("actors", identifier) for identifier in identifiers],
@@ -111,7 +135,7 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             args={"term": query, "cursor": cursor, "limit": limit},
         )
 
-    def get_user_posts(
+    def profile_posts(
         self,
         identifier: str,
         cursor: Optional[str] = None,

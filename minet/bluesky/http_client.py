@@ -129,6 +129,23 @@ class BlueskyHTTPClient:
 
         return response
 
+    def post_quotes(self, post_uri: str) -> Iterator[BlueskyPost]:
+        cursor = None
+
+        while True:
+            url = self.urls.post_quotes(post_uri, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for post in data["posts"]:
+                yield normalize_post(post)
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
+
     def search_posts(
         self,
         query: str,
@@ -265,6 +282,40 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
+    def post_liked_by(self, post_uri: str) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        while True:
+            url = self.urls.post_liked_by(post_uri, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["likes"]:
+                yield normalize_partial_profile(profile["actor"])
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
+
+    def post_reposted_by(self, post_uri: str) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        while True:
+            url = self.urls.post_reposted_by(post_uri, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["repostedBy"]:
+                yield normalize_partial_profile(profile)
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
+
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
         identifier = identifier.lstrip("@")
 
@@ -290,12 +341,11 @@ class BlueskyHTTPClient:
 
         return format_post_at_uri(did, rkey)
 
-    def get_follows(self, did: str) -> Iterator[BlueskyPartialProfile]:
+    def profile_follows(self, did: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
         while True:
-            url = self.urls.get_follows(did, cursor=cursor)
-
+            url = self.urls.profile_follows(did, cursor=cursor)
             response = self.request(url)
             data = response.json()
 
@@ -307,12 +357,11 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
-    def get_followers(self, did: str) -> Iterator[BlueskyPartialProfile]:
+    def profile_followers(self, did: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
         while True:
-            url = self.urls.get_followers(did, cursor=cursor)
-
+            url = self.urls.profile_followers(did, cursor=cursor)
             response = self.request(url)
             data = response.json()
 
@@ -325,11 +374,11 @@ class BlueskyHTTPClient:
                 break
 
     # NOTE: this API route does not return any results for at-uris containing handles!
-    def get_posts(
+    def posts(
         self, did_at_uris: Iterable[str], return_raw=False
     ) -> Iterator[Optional[Union[BlueskyPost, Dict]]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
-            url = self.urls.get_posts(chunk)
+            url = self.urls.posts(chunk)
             response = self.request(url)
             data = response.json()
 
@@ -348,12 +397,11 @@ class BlueskyHTTPClient:
                 # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post_data)
 
-    def get_user_posts(self, did: str) -> Iterator[BlueskyPost]:
+    def profile_posts(self, did: str) -> Iterator[BlueskyPost]:
         cursor = None
 
         while True:
-            url = self.urls.get_user_posts(did, cursor=cursor)
-
+            url = self.urls.profile_posts(did, cursor=cursor)
             response = self.request(url)
             data = response.json()
 
@@ -367,11 +415,11 @@ class BlueskyHTTPClient:
                 break
 
     # NOTE: does this need to accept Optional[str]?
-    def get_profiles(
+    def profiles(
         self, identifiers: Iterable[Optional[str]], return_raw=False
     ) -> Iterator[Optional[Union[BlueskyProfile, Dict]]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
-            url = self.urls.get_profiles(chunk)
+            url = self.urls.profiles(chunk)
             response = self.request(url)
             data = response.json()
 
