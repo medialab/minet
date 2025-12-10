@@ -1,6 +1,5 @@
 from casanova import Enricher
 from itertools import islice
-import os
 from datetime import datetime
 import threading
 from typing import Iterator
@@ -102,27 +101,28 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
         def work(row, query, client: BlueskyHTTPClient, since, until):
             for batch in islice(batched(run(query, client, since, until), 95), int(cli_args.limit) if cli_args.limit else None):
-                lock_on_file.acquire()
-                for post in batch:
-                    post_row = format_post_as_csv_row(post)
-                    enricher.writerow(row, post_row)
-                    loading_bar.nested_advance()
-                lock_on_file.release()
+                with lock_on_file:
+                    for post in batch:
+                        post_row = format_post_as_csv_row(post)
+                        enricher.writerow(row, post_row)
+                        loading_bar.nested_advance()
 
         clients = {}
+        max_clients = 8
         passwords = cli_args.passwords.split(",")
-        for i in range(len(passwords)*2):
-            # Using the same password twice to double the number of clients
-            client = BlueskyHTTPClient(cli_args.identifier, passwords[i//2])
+        number_of_times_to_use_a_password = 2
+        for i in range(len(passwords)*number_of_times_to_use_a_password):
+            # Using the same password multiple times to increase the number of clients
+            client = BlueskyHTTPClient(cli_args.identifier, passwords[i//number_of_times_to_use_a_password])
             clients[i] = (client, False)
-            if len(clients) >= os.cpu_count()//1.5:
+            if len(clients) >= max_clients:
                 break
 
         queries = []
         for row, query in enricher.cells(cli_args.column, with_rows=True):
             queries.append((row, query, cli_args.since, cli_args.until))
 
-        # If not enough queries, we devide them to make sure all clients are used
+        # If not enough queries, we divide them to make sure all clients are used
         while len(queries) < (cli_args.subqueries or len(clients) * 2):
             new_queries = []
             # precedent_query = None
@@ -150,15 +150,13 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
             queries = new_queries
 
-        from minet.cli.console import console
-
         threads : dict[int, tuple[BlueskyHTTPClient, threading.Thread]] = {}
         with loading_bar.step(
                 f"{query}",
                 sub_total=int(cli_args.limit) if cli_args.limit else None,
             ):
-            def printing():
-                console.print(f"Threads: {len(threads)} / Clients [bold green]working[/bold green]: {len([client_working for client_working in [working for _, working in clients.values()] if client_working])} / Clients [bold red]not working[/bold red]: {len([client_not_working for client_not_working in [working for _, working in clients.values()] if not client_not_working])} / Queries left: {len(queries)}", highlight=True)
+            def printing() -> str:
+                return f"Threads: {len(threads)} / Clients [bold green]working[/bold green]: {len([client_working for client_working in [working for _, working in clients.values()] if client_working])} / Clients [bold red]not working[/bold red]: {len([client_not_working for client_not_working in [working for _, working in clients.values()] if not client_not_working])} / Queries left: {len(queries)}"
             while queries:
                 if len(threads) < len(clients):
                     for client_id, (client, working) in clients.copy().items():
@@ -174,15 +172,9 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                         )
                         threads[client_id] = (client, thread)
                         thread.start()
-                        printing()
                 for client_id, (_, thread) in threads.copy().items():
                     if not thread.is_alive():
                         clients[client_id] = (clients[client_id][0], False)
                         del threads[client_id]
-                        printing()
-
             for _, thread in threads.values():
                 thread.join()
-                printing()
-
-
