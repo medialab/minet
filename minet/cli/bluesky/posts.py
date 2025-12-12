@@ -38,7 +38,7 @@ def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     def work(params: Iterable[str]) -> Iterator[BlueskyPost]:
         uris = mixed_urls_and_uris_to_uris(params)
-        return client.get_posts(uris)
+        return client.posts(uris)
 
     for (row, _), post in outer_zip(
         enricher.cells(cli_args.column, with_rows=True), key=lambda x: x[1], work=work
@@ -71,7 +71,7 @@ def action_raw(cli_args, loading_bar: LoadingBar):
                 yield client.resolve_post_url(param)
 
     def work(uris: Iterable[str]) -> Iterator[str]:
-        return client.get_posts(uris, return_raw=True)
+        return client.posts(uris, return_raw=True)
 
     uris = mixed_urls_and_uris_to_uris(params)
 

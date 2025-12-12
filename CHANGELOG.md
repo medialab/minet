@@ -1,5 +1,22 @@
 # Changelog
 
+## 4.2.1
+
+*Fixes*
+
+- Fixing CI
+
+## 4.2.0
+
+*Features*
+
+- Adding `minet telegram channel-messages --desc`
+- Adding lots of `minet bsky` commands.
+
+*Fixes*
+
+- Fixing `minet instagram` stability issues.
+
 ## 4.1.2
 
 *Fixes*
