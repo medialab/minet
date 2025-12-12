@@ -2,6 +2,7 @@ from casanova import Enricher
 from itertools import islice
 from datetime import datetime
 import threading
+import os
 
 from typing import Iterator, List, Tuple
 from quenouille import imap_unordered, NamedLocks
@@ -29,7 +30,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     cli_args.mentions = cli_args.mentions.lstrip("@") if cli_args.mentions else None
     cli_args.author = cli_args.author.lstrip("@") if cli_args.author else None
 
-    if not cli_args.passwords:
+    if not cli_args.parallel:
 
         client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
@@ -76,8 +77,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     loading_bar.nested_advance()
     else:
 
-        passwords = cli_args.passwords.split(",")
-        number_of_times_to_use_a_password = 2
+        number_of_threads = cli_args.threads if cli_args.threads else int(os.cpu_count() * 0.75) or 1
 
 
         def get_queries() -> Iterator[Tuple[List[str], str, str, str]]:
@@ -89,7 +89,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
             # for each query, not per sub-query
             if not cli_args.limit:
                 # If not enough queries, we divide them to make sure all threads are used
-                while len(queries) < len(passwords)*number_of_times_to_use_a_password:
+                while len(queries) < number_of_threads:
                     new_queries = []
                     # Splitting each query in two, by date range
                     for (row, query, since, until) in queries:
@@ -120,21 +120,10 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
         locks = NamedLocks()
         thread_data = threading.local()
-        global password_index
-        password_index = 0
 
         def initialize_client():
-            with locks["passwords"]:
-                global password_index
-                password = passwords[password_index//number_of_times_to_use_a_password]
-                password_index += 1
-
-
-            thread_data.password_index = password_index
-            thread_data.password = password
-
             with locks["cli_args"]:
-                thread_data.client = BlueskyHTTPClient(cli_args.identifier, password)
+                thread_data.client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
         def batched(iterable, n, *, strict=False):
             # batched('ABCDEFG', 2) → AB CD EF G
@@ -172,7 +161,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
         for _ in imap_unordered(
             get_queries(),
             work,
-            threads=len(passwords)*number_of_times_to_use_a_password,
+            threads=number_of_threads,
             initializer=initialize_client,
             wait=False,
             daemonic=True,
