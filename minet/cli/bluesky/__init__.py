@@ -22,6 +22,13 @@ BLUESKY_FIREHOSE_COMMAND = command(
     description="""
         Plug into the Bluesky Firehose.
     """,
+    arguments=[
+        {
+            "flag": "--since",
+            "type": PartialISODatetimeType(False),
+            "help": "Start collecting posts from the given datetime (inclusive). Note that the Bluesky Jetstream firehose only allows to start from up to one day in the past.",
+        }
+    ]
 )
 
 BLUESKY_PROFILE_FOLLOWS_COMMAND = command(

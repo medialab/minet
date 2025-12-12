@@ -5,7 +5,6 @@ import json
 
 # import libipld
 # import time
-# import datetime
 
 from casanova.writer import Writer
 
@@ -25,14 +24,14 @@ from minet.cli.console import console
 bsky_jetstream_public_instances = [
     "jetstream1.us-east.bsky.network",
     "jetstream2.us-east.bsky.network",
-    "jetstream1.eu-west.bsky.network",
-    "jetstream2.eu-west.bsky.network",
+    "jetstream1.us-west.bsky.network",
+    "jetstream2.us-west.bsky.network",
 ]
 
 # JetStream doc
 # https://github.com/bluesky-social/jetstream#
 
-uri = "wss://" + bsky_jetstream_public_instances[1] + "/subscribe?wantedCollections=app.bsky.feed.post"
+URI = "wss://" + bsky_jetstream_public_instances[0] + "/subscribe?wantedCollections=app.bsky.feed.post"
 
 # It seems that the cursor param can be used to start from a given timestamp
 # (in microseconds since epoch) only up to one day in the past
@@ -80,8 +79,13 @@ def action(cli_args, loading_bar: LoadingBar):
     #             console.print(path[0], highlight=True)
 
     async def listen_to_websocket():
+        uri = URI
+        if cli_args.since:
+            since_timestamp = int(cli_args.since.timestamp() * 1_000_000)
+            uri_with_cursor = uri + f"&cursor={since_timestamp}"
+            uri = uri_with_cursor
         async with websockets.connect(uri) as websocket:
-            with loading_bar.step("Listening to Bluesky Jetstream firehose..."):
+                loading_bar.set_title("Listening to Bluesky Jetstream firehose...")
                 writer = Writer(cli_args.output, fieldnames=PARTIAL_POST_FIELDS)
 
                 while True:
@@ -114,7 +118,11 @@ def action(cli_args, loading_bar: LoadingBar):
                     except websockets.ConnectionClosed as e:
                         console.print(f"Connection closed: {e}", highlight=True)
                         break
+                    except KeyboardInterrupt:
+                        console.print("Keyboard interrupt received. Exiting...", highlight=True)
+                        break
                     except Exception as e:
+                        continue
                         console.print(f"Error: {e}", highlight=True)
 
     asyncio.get_event_loop().run_until_complete(listen_to_websocket())
