@@ -113,7 +113,7 @@ class BlueskyHTTPClient:
             headers=headers,
         )
 
-        # HTTP status 429 is rate limiting, we handle it separately without raising an error
+        # HTTP status 429 is rate limiting, we handle it separately
         if response.status != 429 and response.status >= 400:
             data = response.json()
             if "error" in data:
@@ -132,10 +132,11 @@ class BlueskyHTTPClient:
 
             if remaining <= 0:
                 self.rate_limit_reset = int(response.headers["RateLimit-Reset"])
-                if response.status == 429:
-                    # We don't want to return the response in this case, as it indicates an error
-                    # and it will stop the normal flow of the program
-                    raise BlueskyRateLimitExceededError() # Will retry the request after sleeping
+
+        if response.status == 429:
+            # We don't want to return the response in this case, as it indicates an error
+            # and it will stop the normal flow of the program
+            raise BlueskyRateLimitExceededError() # Will retry the request after sleeping
 
         return response
 

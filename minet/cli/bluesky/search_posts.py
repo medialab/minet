@@ -79,17 +79,22 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
         number_of_threads = cli_args.threads if cli_args.threads else int(os.cpu_count() * 0.75) or 1
 
+        global remaining_subqueries_per_query
+        remaining_subqueries_per_query = {}
 
         def get_queries() -> Iterator[Tuple[List[str], str, str, str]]:
+            global remaining_subqueries_per_query
             queries = []
             for row, query in enricher.cells(cli_args.column, with_rows=True):
                 queries.append((row, query, cli_args.since, cli_args.until))
+                remaining_subqueries_per_query[query] = remaining_subqueries_per_query.get(query, 0) + 1
 
             # Not dividing queries if limit is set, as we want to limit the total number of posts
             # for each query, not per sub-query
             if not cli_args.limit:
                 # If not enough queries, we divide them to make sure all threads are used
                 while len(queries) < number_of_threads:
+                    remaining_subqueries_per_query = {}
                     new_queries = []
                     # Splitting each query in two, by date range
                     for (row, query, since, until) in queries:
@@ -97,10 +102,12 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                             # Date of public release of Bluesky
                             since = "2024-02-06T00:00:00.000000Z"
                             new_queries.append((row, query, "0001-01-01T00:00:00.000000Z", since))
+                            remaining_subqueries_per_query[query] = remaining_subqueries_per_query.get(query, 0) + 1
                         elif since <= "2024-02-06T00:00:00.000000Z":
                             # We don't split the query before Bluesky release date
                             # as posts quantity before this date is less dense
                             new_queries.append((row, query, since, until))
+                            remaining_subqueries_per_query[query] = remaining_subqueries_per_query.get(query, 0) + 1
                             continue
                         if not until:
                             until = datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -112,6 +119,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                         middle_date = datetime.strftime(middle_dt, "%Y-%m-%dT%H:%M:%S.%fZ")
                         new_queries.append((row, query, since, middle_date))
                         new_queries.append((row, query, middle_date, until))
+                        remaining_subqueries_per_query[query] = remaining_subqueries_per_query.get(query, 0) + 2
 
                     queries = new_queries
 
@@ -150,15 +158,18 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     domain=cli_args.domain,
                     url=cli_args.url,
                 ), int(cli_args.limit) if cli_args.limit else None), 100):
+                with locks["loading_bar"]:
+                    loading_bar.nested_advance(len(batch))
+                    loading_bar.inc_stat(query, len(batch), style="info")
                 for post in batch:
                     post_row = format_post_as_csv_row(post)
                     with locks["enricher"]:
                         enricher.writerow(row, post_row)
-                        loading_bar.nested_advance()
+
+            return query
 
 
-
-        for _ in imap_unordered(
+        for query in imap_unordered(
             get_queries(),
             work,
             threads=number_of_threads,
@@ -166,5 +177,8 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
             wait=False,
             daemonic=True,
         ):
-            with locks["enricher"]:
-                loading_bar.advance()
+            remaining_subqueries_per_query[query] -= 1
+            if remaining_subqueries_per_query[query] <= 0:
+                with locks["loading_bar"]:
+                    loading_bar.advance()
+                    loading_bar.set_stat(query, None)
