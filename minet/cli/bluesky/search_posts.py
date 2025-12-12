@@ -4,7 +4,7 @@ from datetime import datetime
 import threading
 
 from typing import Iterator, List, Tuple
-from quenouille import imap, NamedLocks
+from quenouille import imap_unordered, NamedLocks
 
 from twitwi.bluesky.constants import POST_FIELDS
 from twitwi.bluesky import format_post_as_csv_row
@@ -169,16 +169,13 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
 
 
-
-        with loading_bar.step(
-                sub_total=int(cli_args.limit) if cli_args.limit else None,
-            ):
-            for _ in imap(
-                get_queries(),
-                work,
-                threads=len(passwords)*number_of_times_to_use_a_password,
-                initializer=initialize_client,
-                wait=False,
-                daemonic=True,
-            ):
+        for _ in imap_unordered(
+            get_queries(),
+            work,
+            threads=len(passwords)*number_of_times_to_use_a_password,
+            initializer=initialize_client,
+            wait=False,
+            daemonic=True,
+        ):
+            with locks["enricher"]:
                 loading_bar.advance()
