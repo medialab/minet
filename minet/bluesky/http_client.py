@@ -109,7 +109,8 @@ class BlueskyHTTPClient:
             headers=headers,
         )
 
-        if response.status >= 400:
+        # HTTP status 429 is rate limiting, we handle it separately without raising an error
+        if response.status != 429 and response.status >= 400:
             data = response.json()
             if "error" in data:
                 e = data["error"]

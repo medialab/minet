@@ -2,10 +2,11 @@ from casanova import Enricher
 from itertools import islice
 from datetime import datetime
 import threading
-from typing import Iterator
+
+from typing import Iterator, List, Tuple
+from quenouille import imap, NamedLocks
 
 from twitwi.bluesky.constants import POST_FIELDS
-from twitwi.bluesky.types import BlueskyPost
 from twitwi.bluesky import format_post_as_csv_row
 
 from minet.cli.utils import with_enricher_and_loading_bar
@@ -74,20 +75,66 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     enricher.writerow(row, post_row)
                     loading_bar.nested_advance()
     else:
-        lock_on_file = threading.Lock()
 
-        def run(query, client: BlueskyHTTPClient, since, until) -> Iterator[BlueskyPost]:
-            for post in client.search_posts(
-                    query,
-                    lang=cli_args.lang,
-                    since=since,
-                    until=until,
-                    mentions=cli_args.mentions,
-                    author=cli_args.author,
-                    domain=cli_args.domain,
-                    url=cli_args.url,
-                ):
-                yield post
+        passwords = cli_args.passwords.split(",")
+        number_of_times_to_use_a_password = 2
+
+
+        def get_queries() -> Iterator[Tuple[List[str], str, str, str]]:
+            queries = []
+            for row, query in enricher.cells(cli_args.column, with_rows=True):
+                queries.append((row, query, cli_args.since, cli_args.until))
+
+            # Not dividing queries if limit is set, as we want to limit the total number of posts
+            # for each query, not per sub-query
+            if not cli_args.limit:
+                # If not enough queries, we divide them to make sure all threads are used
+                while len(queries) < len(passwords)*number_of_times_to_use_a_password:
+                    new_queries = []
+                    # Splitting each query in two, by date range
+                    for (row, query, since, until) in queries:
+                        if not since:
+                            # Date of public release of Bluesky
+                            since = "2024-02-06T00:00:00.000000Z"
+                            new_queries.append((row, query, "0001-01-01T00:00:00.000000Z", since))
+                        elif since <= "2024-02-06T00:00:00.000000Z":
+                            # We don't split the query before Bluesky release date
+                            # as posts quantity before this date is less dense
+                            new_queries.append((row, query, since, until))
+                            continue
+                        if not until:
+                            until = datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.%fZ")
+
+                        since_dt = datetime.strptime(since, "%Y-%m-%dT%H:%M:%S.%fZ")
+                        until_dt = datetime.strptime(until, "%Y-%m-%dT%H:%M:%S.%fZ")
+                        middle_dt = since_dt + (until_dt - since_dt) / 2
+
+                        middle_date = datetime.strftime(middle_dt, "%Y-%m-%dT%H:%M:%S.%fZ")
+                        new_queries.append((row, query, since, middle_date))
+                        new_queries.append((row, query, middle_date, until))
+
+                    queries = new_queries
+
+            for row, query, since, until in queries:
+                yield (row, query, since, until)
+
+        locks = NamedLocks()
+        thread_data = threading.local()
+        global password_index
+        password_index = 0
+
+        def initialize_client():
+            with locks["passwords"]:
+                global password_index
+                password = passwords[password_index//number_of_times_to_use_a_password]
+                password_index += 1
+
+
+            thread_data.password_index = password_index
+            thread_data.password = password
+
+            with locks["cli_args"]:
+                thread_data.client = BlueskyHTTPClient(cli_args.identifier, password)
 
         def batched(iterable, n, *, strict=False):
             # batched('ABCDEFG', 2) → AB CD EF G
@@ -99,82 +146,39 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     raise ValueError('batched(): incomplete batch')
                 yield batch
 
-        def work(row, query, client: BlueskyHTTPClient, since, until):
-            for batch in islice(batched(run(query, client, since, until), 95), int(cli_args.limit) if cli_args.limit else None):
-                with lock_on_file:
-                    for post in batch:
-                        post_row = format_post_as_csv_row(post)
+        def work(item: Tuple[List[str], str, str, str]) -> Iterator[Tuple[List[str], List[str]]]:
+            row, query, since, until = item
+
+            # console.print(f"[bold green]Client {thread_data.password_index}[/bold green] ([purple]{thread_data.password}[/purple]) working on query: [yellow]{query}[/yellow]")
+
+            for batch in batched(islice(thread_data.client.search_posts(
+                    query,
+                    lang=cli_args.lang,
+                    since=since,
+                    until=until,
+                    mentions=cli_args.mentions,
+                    author=cli_args.author,
+                    domain=cli_args.domain,
+                    url=cli_args.url,
+                ), int(cli_args.limit) if cli_args.limit else None), 100):
+                for post in batch:
+                    post_row = format_post_as_csv_row(post)
+                    with locks["enricher"]:
                         enricher.writerow(row, post_row)
                         loading_bar.nested_advance()
 
-        clients = {}
-        max_clients = 8
-        passwords = cli_args.passwords.split(",")
-        number_of_times_to_use_a_password = 2
-        for i in range(len(passwords)*number_of_times_to_use_a_password):
-            # Using the same password multiple times to increase the number of clients
-            client = BlueskyHTTPClient(cli_args.identifier, passwords[i//number_of_times_to_use_a_password])
-            clients[i] = (client, False)
-            if len(clients) >= max_clients:
-                break
 
-        queries = []
-        for row, query in enricher.cells(cli_args.column, with_rows=True):
-            queries.append((row, query, cli_args.since, cli_args.until))
 
-        # If not enough queries, we divide them to make sure all clients are used
-        while len(queries) < (cli_args.subqueries or len(clients) * 2):
-            new_queries = []
-            # precedent_query = None
-            # precedent_since = None
-            for (row, query, since, until) in queries:
-                if not since:
-                    # Date of public release of Bluesky
-                    since = "2024-02-06T00:00:00.000000Z"
-                    new_queries.append((row, query, "0001-01-01T00:00:00.000000Z", since))
-                elif since <= "2024-02-06T00:00:00.000000Z":
-                    # We don't split the query before Bluesky release date
-                    # as posts quantity before this date is less dense
-                    new_queries.append((row, query, since, until))
-                    continue
-                if not until:
-                    until = datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.%fZ")
 
-                since_dt = datetime.strptime(since, "%Y-%m-%dT%H:%M:%S.%fZ")
-                until_dt = datetime.strptime(until, "%Y-%m-%dT%H:%M:%S.%fZ")
-                middle_dt = since_dt + (until_dt - since_dt) / 2
-
-                middle_date = datetime.strftime(middle_dt, "%Y-%m-%dT%H:%M:%S.%fZ")
-                new_queries.append((row, query, since, middle_date))
-                new_queries.append((row, query, middle_date, until))
-
-            queries = new_queries
-
-        threads : dict[int, tuple[BlueskyHTTPClient, threading.Thread]] = {}
         with loading_bar.step(
-                f"{query}",
                 sub_total=int(cli_args.limit) if cli_args.limit else None,
             ):
-            def printing() -> str:
-                return f"Threads: {len(threads)} / Clients [bold green]working[/bold green]: {len([client_working for client_working in [working for _, working in clients.values()] if client_working])} / Clients [bold red]not working[/bold red]: {len([client_not_working for client_not_working in [working for _, working in clients.values()] if not client_not_working])} / Queries left: {len(queries)}"
-            while queries:
-                if len(threads) < len(clients):
-                    for client_id, (client, working) in clients.copy().items():
-                        if working:
-                            continue
-                        if not queries:
-                            break
-                        row, query, since, until = queries.pop()
-                        clients[client_id] = (client, True)
-                        thread = threading.Thread(
-                            target=work,
-                            args=(row, query, client, since, until),
-                        )
-                        threads[client_id] = (client, thread)
-                        thread.start()
-                for client_id, (_, thread) in threads.copy().items():
-                    if not thread.is_alive():
-                        clients[client_id] = (clients[client_id][0], False)
-                        del threads[client_id]
-            for _, thread in threads.values():
-                thread.join()
+            for _ in imap(
+                get_queries(),
+                work,
+                threads=len(passwords)*number_of_times_to_use_a_password,
+                initializer=initialize_client,
+                wait=False,
+                daemonic=True,
+            ):
+                loading_bar.advance()
