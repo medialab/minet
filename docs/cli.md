@@ -2627,7 +2627,7 @@ Usage: minet bluesky search-posts [-h] [--lang LANG] [--silent]
                                   [--simple-progress] [--since SINCE]
                                   [--until UNTIL] [--mentions MENTIONS]
                                   [--author AUTHOR] [--domain DOMAIN]
-                                  [--url URL] [-l LIMIT]
+                                  [--url URL] [-l LIMIT] [-p] [-t THREADS]
                                   [--identifier IDENTIFIER] [--rcfile RCFILE]
                                   [--password PASSWORD] [-i INPUT]
                                   [--explode EXPLODE] [-s SELECT]
@@ -2667,6 +2667,11 @@ Optional Arguments:
                                 DID before query-time. Only matches rich-text
                                 facet mentions. Equivalent to
                                 "mentions:<account>" in classic search syntax.
+  -p, --parallel                Use parallel requests to speed up the collection
+                                of posts. Note that using this flag will make
+                                the output order non-deterministic (posts from
+                                different queries may be interleaved, and may be
+                                disordered).
   --password PASSWORD           Bluesky app password (not your personal
                                 password, must be created here:
                                 https://bsky.app/settings/app-passwords). Can
@@ -2681,6 +2686,12 @@ Optional Arguments:
                                 YYYY-MM-DDTHH:mm:SSZ or
                                 YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to
                                 "since:<date>" in classic search syntax.
+  -t, --threads THREADS         Number of threads to use for parallel requests
+                                when the -p/--parallel flag is set. Default is
+                                3/4 of number of CPU cores. Note that the
+                                Bluesky API rate limits to ~1000 posts/s, so
+                                using too many threads may lead to rate
+                                limiting.
   --until UNTIL                 Filter results for posts before the indicated
                                 datetime (NOT inclusive). Expected to use
                                 'createdAt' timestamp, with a millisecond
@@ -5091,7 +5102,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [--silent]
                                        [--refresh-per-second REFRESH_PER_SECOND]
-                                       [--simple-progress] [-i INPUT]
+                                       [--simple-progress] [--desc] [-i INPUT]
                                        [--explode EXPLODE] [-s SELECT]
                                        [--total TOTAL] [-o OUTPUT]
                                        channel_name_or_channel_name_column
@@ -5107,6 +5118,8 @@ Positional Arguments:
                                 when using -i/--input.
 
 Optional Arguments:
+  --desc                        Whether to collect data in reverse chronological
+                                order instead of default chronological order.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the

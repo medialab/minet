@@ -298,7 +298,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
         {
             "flags": ["-t", "--threads"],
             "type": int,
-            "help": "Number of threads to use for parallel requests when the --parallel flag is set. Default is 75% of number of CPU cores. Note that the Bluesky API rate limits to ~1000 posts/s, so using too many threads may lead to rate limiting.",
+            "help": "Number of threads to use for parallel requests when the -p/--parallel flag is set. Default is 3/4 of number of CPU cores. Note that the Bluesky API rate limits to ~1000 posts/s, so using too many threads may lead to rate limiting.",
         },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
