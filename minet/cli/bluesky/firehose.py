@@ -73,7 +73,7 @@ def action(cli_args, loading_bar: LoadingBar):
 
     client = BlueskyWebSocketClient()
 
-    with client.subscribe_repos(suffix) as socket:
+    with client.subscribe_repos(True, suffix) as socket:
         loading_bar.set_title("Listening to Bluesky Jetstream firehose...")
         writer = Writer(cli_args.output, fieldnames=PARTIAL_POST_FIELDS)
 
