@@ -7143,9 +7143,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter tweets [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--simple-progress] [-f] [-i INPUT]
-                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                            [--resume] [-o OUTPUT]
+                            [--simple-progress] [-f] [--unlogged] [--raw]
+                            [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                            [--total TOTAL] [--resume] [-o OUTPUT]
                             tweet_id_or_tweet_id_column
 
 # Minet Twitter Tweets Command
@@ -7165,6 +7165,10 @@ Optional Arguments:
                                 a .minetrc file as "twitter.cookie" or read from
                                 the MINET_TWITTER_COOKIE env variable.
   -f, --force                   Bypass confirmation.
+  --raw                         Return the raw tweet data in JSON as received
+                                from the API instead of a normalized version.
+  --unlogged                    Whether to use an unauthenticated scraping mode
+                                (might be more limited).
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
