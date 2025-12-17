@@ -26,7 +26,7 @@ BLUESKY_FIREHOSE_COMMAND = command(
         {
             "flag": "--since",
             "type": PartialISODatetimeType(False),
-            "help": "Start collecting posts from the given datetime (inclusive). Note that the Bluesky Jetstream firehose only allows to start from up to one day in the past.",
+            "help": "Start collecting posts from the given datetime (inclusive, timezone UTC). Note that the Bluesky Jetstream firehose only allows to start from up to one day in the past. Moreover, note that the date used correspons to the firehose event timestamp, only used for configuring or debugging the firehose itself, so it might not corresponds exactly to the first collected post dates.",
         }
     ]
 )

@@ -26,6 +26,7 @@ _Generic commands_
 _Platform-related commands_
 
 - [bluesky (bsky)](#bluesky)
+  - [firehose](#firehose)
   - [posts](#posts)
   - [post-liked-by](#post-liked-by)
   - [post-quotes](#post-quotes)
@@ -1841,6 +1842,45 @@ Subcommands:
     profile-follows             Minet Bluesky Get Follows from Handle or DID
                                 command
     profile-posts               Minet Bluesky Get Profile Posts command
+```
+
+### firehose
+
+```
+Usage: minet bluesky firehose [-h] [--since SINCE] [--silent]
+                              [--refresh-per-second REFRESH_PER_SECOND]
+                              [--simple-progress] [-o OUTPUT]
+
+# Minet Bluesky Firehose command
+
+Plug into the Bluesky Firehose.
+
+Optional Arguments:
+  --since SINCE                 Start collecting posts from the given datetime
+                                (inclusive, timezone UTC). Note that the Bluesky
+                                Jetstream firehose only allows to start from up
+                                to one day in the past. Moreover, note that the
+                                date used correspons to the firehose event
+                                timestamp, only used for configuring or
+                                debugging the firehose itself, so it might not
+                                corresponds exactly to the first collected post
+                                dates.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 ```
 
 ### posts

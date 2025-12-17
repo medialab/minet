@@ -1,5 +1,6 @@
 import websockets
 import json
+from datetime import timezone
 
 # import libipld
 # import time
@@ -67,6 +68,7 @@ def action(cli_args, loading_bar: LoadingBar):
 
     suffix = "?wantedCollections=app.bsky.feed.post"
     if cli_args.since:
+        cli_args.since = cli_args.since.replace(tzinfo=timezone.utc)
         since_timestamp = int(cli_args.since.timestamp() * 1_000_000)
         suffix += f"&cursor={since_timestamp}"
 
