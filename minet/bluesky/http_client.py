@@ -136,7 +136,11 @@ class BlueskyHTTPClient:
         if response.status == 429:
             # We don't want to return the response in this case, as it indicates an error
             # and it will stop the normal flow of the program
-            raise BlueskyRateLimitExceededError() # Will retry the request after sleeping
+
+            if self.rate_limit_reset is not None:
+                response = self.request(url, method=method, json_body=json_body)
+            else:
+                raise BlueskyRateLimitExceededError() # Will retry the request after sleeping
 
         return response
 
@@ -283,7 +287,6 @@ class BlueskyHTTPClient:
             if not oldest_uris_len_changed and not oldest_date_changed:
                 break
 
-        console.print(f"Oldest post date for [blue]{query}[/blue]: {datetime.fromtimestamp(oldest_post_timestamp_utc / 1000, tz=timezone.utc)}", style="purple")
 
     def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None

@@ -146,8 +146,6 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
         def work(item: Tuple[List[str], str, str, str]) -> Iterator[Tuple[List[str], List[str]]]:
             row, query, since, until = item
 
-            # console.print(f"[bold green]Client {thread_data.password_index}[/bold green] ([purple]{thread_data.password}[/purple]) working on query: [yellow]{query}[/yellow]")
-
             for batch in batched(islice(thread_data.client.search_posts(
                     query,
                     lang=cli_args.lang,
