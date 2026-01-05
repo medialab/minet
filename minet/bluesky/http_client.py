@@ -111,6 +111,7 @@ class BlueskyHTTPClient:
             json_body=json_body,
             known_encoding="utf-8",
             headers=headers,
+            raise_on_statuses=[502]
         )
 
         # HTTP status 429 is rate limiting, we handle it separately
