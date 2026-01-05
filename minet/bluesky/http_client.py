@@ -17,7 +17,6 @@ from minet.web import (
     Response,
 )
 
-from minet.cli.console import console
 
 from minet.bluesky.urls import (
     BlueskyHTTPAPIUrlFormatter,
@@ -283,17 +282,9 @@ class BlueskyHTTPClient:
                 and cursor == old_cursor
                 and len(oldest_post_uris) <= 10000
             ):
-                console.print(
-                    f"The oldest post date did not change, no new uris were added to the 'already seen uris' list and we reached the same point as before (cursor = [blue]{cursor}[/blue]).",
-                    style="yellow",
-                )
                 break
 
             if len(oldest_post_uris) > 10000:
-                console.print(
-                    f"There is more than 10,000 posts with the same date ([blue]{datetime.fromtimestamp(oldest_post_timestamp_utc / 1000, tz=timezone.utc).strftime(SOURCE_DATETIME_FORMAT_V2) if oldest_post_timestamp_utc else 'N/A'}[/blue]), we will continue paging with time ranges to try to get more posts.",
-                    style="yellow",
-                )
                 oldest_post_timestamp_utc -= time_overlap
                 cursor = None  # to force time paging
 
@@ -321,8 +312,6 @@ class BlueskyHTTPClient:
             # at the beginning of a new time range page
             if oldest_uris_len_changed:
                 old_cursor = cursor
-
-        console.print(f"\t[bold red]Stopping query [blue]{query}[/blue].[/bold red]")
 
     def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
