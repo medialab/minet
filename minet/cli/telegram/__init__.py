@@ -53,7 +53,14 @@ TELEGRAM_CHANNEL_MESSAGES_SUBCOMMAND = command(
         "item_label": "channel name / url",
         "item_label_plural": "channel names / urls",
     },
-    arguments=[THROTTLE_ARGUMENT],
+    arguments=[
+        THROTTLE_ARGUMENT,
+        {
+            "flag": "--desc",
+            "help": "Whether to collect data in reverse chronological order instead of default chronological order.",
+            "action": "store_true",
+        },
+    ],
 )
 
 TELEGRAM_COMMAND = command(

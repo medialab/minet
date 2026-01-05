@@ -26,7 +26,7 @@ _How to cite?_
 
 You can cite it thusly:
 
-> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel, César Pichon, Kelly Christensen, Julien Pontoire, & Béatrice Mazoyer. (2025, Mai 14). Minet, a webmining CLI tool & library for python. (4.1.0). Zenodo. https://doi.org/10.5281/zenodo.15411918
+> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel, César Pichon, Kelly Christensen, Julien Pontoire, Béatrice Mazoyer, & Evan Chevalerias. (2025, Dec 2). Minet, a webmining CLI tool & library for python. (4.1.0). Zenodo. https://doi.org/10.5281/zenodo.15411918
 
 ## Whirlwind tour
 

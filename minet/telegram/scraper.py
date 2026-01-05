@@ -4,8 +4,17 @@
 #
 # Functions to scrape Telegram.
 #
-from bs4 import BeautifulSoup
 import re
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+
+from ural.telegram import (
+    convert_telegram_url_to_public,
+    parse_telegram_url,
+    TelegramChannel as ParsedTelegramChannel,
+    TelegramGroup as ParsedTelegramGroup,
+    TelegramMessage as ParsedTelegramMessage,
+)
 
 from minet.rate_limiting import (
     rate_limited_method,
@@ -23,13 +32,6 @@ from minet.telegram.constants import (
     TELEGRAM_URL,
     TELEGRAM_DEFAULT_THROTTLE,
 )
-from ural.telegram import (
-    convert_telegram_url_to_public,
-    parse_telegram_url,
-    TelegramChannel as ParsedTelegramChannel,
-    TelegramGroup as ParsedTelegramGroup,
-    TelegramMessage as ParsedTelegramMessage,
-)
 from minet.telegram.types import TelegramChannelInfos, TelegramChannelMessages
 from minet.telegram.exceptions import TelegramInvalidTargetError
 
@@ -37,14 +39,17 @@ TELEGRAM_IMG_RE = re.compile(r"background-image:url\(\'(.*?)\'\)")
 TELEGRAM_HASHTAG_RE = re.compile(r"\?q=%23(.*)")
 
 
-def forge_telegram_channel_url(name):
-    url = TELEGRAM_URL + name + "/1"
+def forge_telegram_channel_url(name, desc: bool = False):
+    url = TELEGRAM_URL + name
+
+    if not desc:
+        url += "/1"
+
     return url
 
 
 def forge_telegram_channel_url_next(url, next_after):
-    url = TELEGRAM_URL + next_after
-    return url
+    return urljoin(TELEGRAM_URL, next_after)
 
 
 def scrape_channel_infos(html) -> TelegramChannelInfos:
@@ -106,7 +111,7 @@ def scrape_channel_infos(html) -> TelegramChannelInfos:
     )
 
 
-def scrape_channel_messages(html):
+def scrape_channel_messages(html, desc: bool = False):
     results = []
     soup = BeautifulSoup(html, "lxml")
 
@@ -117,7 +122,9 @@ def scrape_channel_messages(html):
     if not messages_section:
         raise TelegramInvalidTargetError
 
-    next_after = messages_section.select_one("a[data-after]")
+    next_after_css = "a[data-before]" if desc else "a[data-after]"
+
+    next_after = messages_section.select_one(next_after_css)
     if next_after:
         next_after = next_after.get("href")
 
@@ -355,7 +362,7 @@ class TelegramScraper(object):
 
         return scrape_channel_infos(html)
 
-    def channel_messages(self, name):
+    def channel_messages(self, name, desc: bool = False):
         parsed = parse_telegram_url(name)
 
         if isinstance(parsed, ParsedTelegramGroup):
@@ -366,7 +373,9 @@ class TelegramScraper(object):
         ):
             name = parsed.name
 
-        url = convert_telegram_url_to_public(forge_telegram_channel_url(name))
+        url = convert_telegram_url_to_public(
+            forge_telegram_channel_url(name, desc=desc)
+        )
 
         def generator():
             current_url = url
@@ -374,7 +383,7 @@ class TelegramScraper(object):
             while True:
                 html = self.request_page(current_url)
 
-                next_after, messages = scrape_channel_messages(html)
+                next_after, messages = scrape_channel_messages(html, desc=desc)
 
                 for message in messages:
                     yield message

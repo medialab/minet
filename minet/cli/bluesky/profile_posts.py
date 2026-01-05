@@ -1,0 +1,39 @@
+from casanova import Enricher
+
+from itertools import islice
+
+from twitwi.bluesky.constants import POST_FIELDS
+from twitwi.bluesky import format_post_as_csv_row
+
+from minet.cli.utils import with_enricher_and_loading_bar
+from minet.cli.loading_bar import LoadingBar
+
+from minet.cli.bluesky.utils import with_bluesky_fatal_errors
+
+from minet.bluesky import BlueskyHTTPClient
+
+
+@with_bluesky_fatal_errors
+@with_enricher_and_loading_bar(
+    headers=POST_FIELDS,
+    title="Getting posts",
+    unit="profiles",
+    nested=True,
+    sub_unit="posts",
+)
+def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
+    client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
+
+    for row, profile in enricher.cells(cli_args.column, with_rows=True):
+        if not profile.startswith("did:"):
+            did = client.resolve_handle(profile)
+        else:
+            did = profile
+        with loading_bar.step(did):
+            for post in islice(
+                client.profile_posts(did),
+                int(cli_args.limit) if cli_args.limit else None,
+            ):
+                post_row = format_post_as_csv_row(post, allow_erroneous_plurals=True)
+                enricher.writerow(row, post_row)
+                loading_bar.nested_advance()

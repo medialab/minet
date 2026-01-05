@@ -285,7 +285,7 @@ class InstagramPost(TabularRecord):
             text,
             hashtags,
             mentioned_names,
-            payload["like_and_view_counts_disabled"],
+            payload.get("like_and_view_counts_disabled", False),
             payload["like_count"],
             payload["comment_count"],
             shortcode_to_url(payload["code"]) + "media/?size=l",

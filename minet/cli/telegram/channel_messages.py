@@ -25,7 +25,7 @@ def action(cli_args, enricher, loading_bar):
     ):
         with loading_bar.step(channel):
             try:
-                messages = scraper.channel_messages(channel)
+                messages = scraper.channel_messages(channel, desc=cli_args.desc)
 
                 for message in messages:
                     enricher.writerow(row, message)
