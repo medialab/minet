@@ -2501,8 +2501,7 @@ Usage: minet bluesky search-posts [-h] [--lang LANG] [--silent]
                                   [--simple-progress] [--since SINCE]
                                   [--until UNTIL] [--mentions MENTIONS]
                                   [--author AUTHOR] [--domain DOMAIN]
-                                  [--url URL] [--store-errors STORE_ERRORS]
-                                  [--overwrite-errors] [-l LIMIT]
+                                  [--url URL] [-l LIMIT]
                                   [--identifier IDENTIFIER] [--rcfile RCFILE]
                                   [--password PASSWORD] [-i INPUT]
                                   [--explode EXPLODE] [-s SELECT]
@@ -2542,8 +2541,6 @@ Optional Arguments:
                                 DID before query-time. Only matches rich-text
                                 facet mentions. Equivalent to
                                 "mentions:<account>" in classic search syntax.
-  --overwrite-errors            Overwrite the errors file if it already exists
-                                (used with --store-errors).
   --password PASSWORD           Bluesky app password (not your personal
                                 password, must be created here:
                                 https://bsky.app/settings/app-passwords). Can
@@ -2559,10 +2556,6 @@ Optional Arguments:
                                 YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to
                                 "since:<date>" in classic search syntax, but the
                                 flag overwrites it when both are provided.
-  --store-errors STORE_ERRORS   Store potential errors and associated post raw
-                                payloads in the given file (.ndjson). Appends to
-                                the file by default. Use the
-                                '--overwrite-errors' flag to overwrite the file.
   --until UNTIL                 Filter results for posts before the indicated
                                 datetime (NOT inclusive). Expected to use
                                 'createdAt' timestamp, with a millisecond

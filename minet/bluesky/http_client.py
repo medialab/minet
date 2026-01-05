@@ -1,4 +1,4 @@
-from typing import Iterator, Iterable, Optional, Any, List, Dict, Union, Tuple
+from typing import Iterator, Iterable, Optional, Any, List, Dict, Union
 
 from time import time, sleep
 from datetime import datetime, timezone
@@ -166,8 +166,7 @@ class BlueskyHTTPClient:
         author: Optional[str] = None,
         domain: Optional[str] = None,
         url: Optional[str] = None,
-        store_errors: bool = False,
-    ) -> Iterator[Union[BlueskyPost, Tuple[str, str]]]:
+    ) -> Iterator[BlueskyPost]:
         cursor = None
         oldest_post_uris: set[str] = set()
         new_oldest_post_uris: set[str] = set()
@@ -201,18 +200,7 @@ class BlueskyHTTPClient:
             data = response.json()
 
             if "posts" not in data or len(data["posts"]) == 0:
-                console.print(
-                    f"There is no post anymore in 'data'. Retrying one time just in case...\n====DATA====\n{data}\n============",
-                    highlight=True,
-                    style="dim",
-                )
-                response = self.request(request_url)
-                data = response.json()
-                if "posts" not in data or len(data["posts"]) == 0:
-                    console.print(
-                        "There is still no post in 'data'. Stopping.", style="dim"
-                    )
-                    break
+                break
 
             oldest_date_changed = False
             oldest_uris_len_changed = False
@@ -228,10 +216,7 @@ class BlueskyHTTPClient:
                     # TODO : handle locale + extract_referenced_posts + collected_via
                     yield normalize_post(post)
                 except Exception as e:
-                    if store_errors:
-                        yield (str(e), post)
-                    else:
-                        raise e
+                    raise e
 
                 # Taking the minimum createdAt time to avoid issues
                 # with posts not being perfectly sorted by createdAt (local_time parameter is createdAt in UTC)
