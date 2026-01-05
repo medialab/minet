@@ -33,38 +33,6 @@ from minet.bluesky.websocket_client import BlueskyWebSocketClient
     unit="posts",
 )
 def action(cli_args, loading_bar: LoadingBar):
-    # with client.subscribe_repos() as socket:
-    #     start = time.time()
-    #     countingposts = 0
-    #     while True:
-    #         payload = socket.recv()
-    #         header, body = libipld.decode_dag_cbor_multi(payload)  # type: ignore
-    #         # console.print(header, highlight=True)
-    #         body = dict(body)
-    #         blocks = body.get("blocks", None)
-    #         if blocks:
-    #             console.print(libipld.decode_car(blocks), highlight=True)
-    #         if not body.get("repo"):
-    #             continue
-    #         did = body["repo"]
-    #         if not body.get("ops"):
-    #             continue
-    #         path = body["ops"][0]["path"].split("/")
-    #         if path[0] == "app.bsky.feed.post":
-    #             post_id = path[-1]
-    #             countingposts += 1
-    #             if countingposts % 1000 == 0:
-    #                 elapsed = time.time() - start
-    #                 console.print(
-    #                     f"Collected {countingposts} posts in {elapsed:.2f} seconds ({countingposts/elapsed:.2f} posts/sec)",
-    #                     highlight=True,
-    #                 )
-    #             # console.print(f"Post found: https://bsky.app/profile/{did}/post/{post_id}", highlight=True)
-    #         elif any(p in path[0] for p in
-    #                  ["feed.like", "feed.repost", "graph.follow", "feed.threadgate", "feed.postgate", "graph.list", "graph.listblock" ,"graph.block", "graph.starterpack", "graph.listitem", "actor.status", "actor.profile", "actor.declaration", "notification.declaration", "feed.generator"]):
-    #             continue
-    #         elif "bsky" in path[0]:
-    #             console.print(path[0], highlight=True)
 
     suffix = "?wantedCollections=app.bsky.feed.post"
     if cli_args.since:

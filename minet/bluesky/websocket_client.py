@@ -13,3 +13,6 @@ class BlueskyWebSocketClient:
         return connect(
             urljoin(BLUESKY_FIREHOSE_BASE_URL, "com.atproto.sync.subscribeRepos")
         )
+
+    def subscribe_local_tap(self) -> ClientConnection:
+        return connect("ws://localhost:2480/channel")

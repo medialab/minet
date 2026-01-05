@@ -31,6 +31,18 @@ BLUESKY_FIREHOSE_COMMAND = command(
     ]
 )
 
+BLUESKY_TAP_COMMAND = command(
+    "tap",
+    "minet.cli.bluesky.tap",
+    title="Minet Bluesky Tap command (experimental)",
+    description="""
+        Plug into the Bluesky Tap socket. (experimental)
+    """,
+    arguments=[
+
+    ]
+)
+
 BLUESKY_PROFILE_FOLLOWS_COMMAND = command(
     "profile-follows",
     "minet.cli.bluesky.profile_follows",
@@ -475,6 +487,7 @@ BLUESKY_COMMAND = command(
     """,
     subcommands=[
         BLUESKY_FIREHOSE_COMMAND,
+        BLUESKY_TAP_COMMAND,
         BLUESKY_POSTS_COMMAND,
         BLUESKY_POST_LIKED_BY_COMMAND,
         BLUESKY_POST_QUOTES_COMMAND,
