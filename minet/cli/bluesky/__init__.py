@@ -350,7 +350,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
     "minet.cli.bluesky.search_posts",
     title="Minet Bluesky Search Post command",
     description="""
-        Search for whether Bluesky posts matching a query or multiple Bluesky posts matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API.
+        Search for whether Bluesky posts matching a query or multiple Bluesky posts matching respectively successives queries from column of a CSV file (note that doing so does not guarantee uniqueness of the results, due to potential overlaps in the result of each query). This command uses the Bluesky HTTP API.
     """,
     variadic_input={"dummy_column": "query"},
     arguments=[
