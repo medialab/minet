@@ -10,6 +10,7 @@ from quenouille import imap_unordered, NamedLocks
 from twitwi.bluesky.constants import POST_FIELDS
 from twitwi.bluesky import format_post_as_csv_row
 
+from minet.dates import PARTIAL_ISO_FORMATS
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.loading_bar import LoadingBar
 
@@ -112,8 +113,22 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                         if not until:
                             until = datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.%fZ")
 
-                        since_dt = datetime.strptime(since, "%Y-%m-%dT%H:%M:%S.%fZ")
-                        until_dt = datetime.strptime(until, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+                        try:
+                            since_possible_date_format, _since_precision = PARTIAL_ISO_FORMATS[len(since)]
+                        except KeyError:
+                            raise ValueError("cannot parse date {!r}".format(since))
+
+                        since_dt = datetime.strptime(since, since_possible_date_format)
+
+                        try:
+                            until_possible_date_format, _until_precision = PARTIAL_ISO_FORMATS[len(until)]
+                        except KeyError:
+                            raise ValueError("cannot parse date {!r}".format(until))
+
+                        until_dt = datetime.strptime(until, until_possible_date_format)
+
+
                         middle_dt = since_dt + (until_dt - since_dt) / 2
 
                         middle_date = datetime.strftime(middle_dt, "%Y-%m-%dT%H:%M:%S.%fZ")
