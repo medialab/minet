@@ -54,7 +54,7 @@ def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
             try:
                 if cli_args.unlogged:
-                    tweet = scraper.get_normalized_tweet(tweet_id, source_version="no_api_key")
+                    tweet = scraper.get_normalized_tweet(tweet_id)
                 else:
                     tweet = scraper.request_tweet_details(tweet_id)
                 tweet = format_tweet_as_csv_row(tweet)
