@@ -43,6 +43,7 @@ class BlueskyHTTPClient:
             additional_exceptions=[BlueskyUpstreamFailureError, BlueskyRateLimitExceededError], retry_on_statuses=[502]
         )
         self.rate_limit_reset: Optional[int] = None
+        self.need_to_wait_until_rate_limit_reset = False
 
         # First auth
         self.create_session(identifier, password)
@@ -94,10 +95,10 @@ class BlueskyHTTPClient:
         method: str = "GET",
         json_body=None,
     ) -> Response:
-        if self.rate_limit_reset is not None:
+        if self.need_to_wait_until_rate_limit_reset:
             # Using max to avoid negative sleep time
             sleep(max(0, self.rate_limit_reset - time() + 1))
-            self.rate_limit_reset = None
+            self.need_to_wait_until_rate_limit_reset = False
 
         if self.is_access_jwt_expired():
             self.refresh_session()
@@ -132,14 +133,22 @@ class BlueskyHTTPClient:
             remaining = int(response.headers["RateLimit-Remaining"])
 
             if remaining <= 0:
-                self.rate_limit_reset = int(response.headers["RateLimit-Reset"])
+                self.need_to_wait_until_rate_limit_reset = True
+
+        self.rate_limit_reset = int(response.headers["RateLimit-Reset"])
 
         if response.status == 429:
             # We don't want to return the response in this case, as it indicates an error
             # and it will stop the normal flow of the program
 
-            if self.rate_limit_reset is not None:
+            if response.headers.get("Content-Length") == "0" and response.headers.get("x-ratelimit-limit") == "3000 per five minutes":
+                # Sometimes Bluesky returns an empty response with 429 status code
+                # and no useful information, so we just wait and retry
+                self.need_to_wait_until_rate_limit_reset = True
+
+            if self.need_to_wait_until_rate_limit_reset:
                 response = self.request(url, method=method, json_body=json_body)
+                self.need_to_wait_until_rate_limit_reset = False
             else:
                 raise BlueskyRateLimitExceededError() # Will retry the request after sleeping
 
@@ -287,6 +296,11 @@ class BlueskyHTTPClient:
             # it means we have reached the end of the available posts
             if not oldest_uris_len_changed and not oldest_date_changed:
                 break
+
+        oldest_post_datetime = datetime.fromtimestamp(
+            oldest_post_timestamp_utc / 1000, tz=timezone.utc
+        ).strftime(SOURCE_DATETIME_FORMAT_V2)
+        console.print(f"Query [blue]{query}[/blue] ended. Oldest post datetime: [blue]{oldest_post_datetime}[/blue]", style="yellow")
 
 
     def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
