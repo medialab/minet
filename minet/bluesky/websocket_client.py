@@ -16,3 +16,11 @@ class BlueskyWebSocketClient:
 
     def subscribe_local_tap(self) -> ClientConnection:
         return connect("ws://localhost:2480/channel")
+
+    # Doesn't work when we need to do a full backup (because of storage saturation on a free railway account)
+    def subscribe_tap_railway(self, url: str, username: str = None, password: str = None) -> ClientConnection:
+        if username and password:
+            import base64
+            credentials = base64.b64encode(f"{username}:{password}".encode()).decode()
+            return connect(url, additional_headers={"Authorization": f"Basic {credentials}"})
+        return connect(url)
