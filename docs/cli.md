@@ -27,6 +27,7 @@ _Platform-related commands_
 
 - [bluesky (bsky)](#bluesky)
   - [firehose](#firehose)
+  - [tap](#tap)
   - [posts](#posts)
   - [post-liked-by](#post-liked-by)
   - [post-quotes](#post-quotes)
@@ -1811,7 +1812,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet bluesky [-h]
-                     {firehose,posts,post-liked-by,post-quotes,post-reposted-by,resolve-handle,resolve-post-url,search-posts,search-profiles,profiles,profile-followers,profile-follows,profile-posts}
+                     {firehose,tap,posts,post-liked-by,post-quotes,post-reposted-by,resolve-handle,resolve-post-url,search-posts,search-profiles,profiles,profile-followers,profile-follows,profile-posts}
                      ...
 
 # Minet Bluesky command
@@ -1822,9 +1823,10 @@ Optional Arguments:
   -h, --help                    show this help message and exit
 
 Subcommands:
-  {firehose,posts,post-liked-by,post-quotes,post-reposted-by,resolve-handle,resolve-post-url,search-posts,search-profiles,profiles,profile-followers,profile-follows,profile-posts}
+  {firehose,tap,posts,post-liked-by,post-quotes,post-reposted-by,resolve-handle,resolve-post-url,search-posts,search-profiles,profiles,profile-followers,profile-follows,profile-posts}
                                 Subcommand to use.
     firehose                    Minet Bluesky Firehose command
+    tap                         Minet Bluesky Tap command (experimental)
     posts                       Minet Bluesky Get Post from URI or URL command
     post-liked-by               Minet Bluesky Get Liked By from URL or URI
                                 command
@@ -1865,6 +1867,36 @@ Optional Arguments:
                                 debugging the firehose itself, so it might not
                                 corresponds exactly to the first collected post
                                 dates.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+```
+
+### tap
+
+```
+Usage: minet bluesky tap [-h] [-o OUTPUT] [--silent]
+                         [--refresh-per-second REFRESH_PER_SECOND]
+                         [--simple-progress]
+
+# Minet Bluesky Tap command (experimental)
+
+Plug into the Bluesky Tap socket. (experimental) Doc of Tap: https://docs.bsky.app/blog/introducing-tap
+
+Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.

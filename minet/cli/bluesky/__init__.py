@@ -36,7 +36,7 @@ BLUESKY_TAP_COMMAND = command(
     "minet.cli.bluesky.tap",
     title="Minet Bluesky Tap command (experimental)",
     description="""
-        Plug into the Bluesky Tap socket. (experimental)
+        Plug into the Bluesky Tap socket. (experimental) Doc of Tap: https://docs.bsky.app/blog/introducing-tap
     """,
     arguments=[
 
