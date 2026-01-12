@@ -31,6 +31,9 @@ To illustrate this issue, we made a collection of all posts having the `lang` at
 
 As a workaround, it is recommended to use a language detection library on the post content to determine its language more accurately.
 
+### **Tip** : Unique identifier of a post
+The unique identifier of a regular post on Bluesky is its `uri` field, which follows the pattern `at://{user_did}/app.bsky.feed.post/{post_did}`.
+
 ### **Tip** : Different types of publications on Bluesky
 There are several types of publications on Bluesky, which might break your normalization process if you don't know them:
 - Regular posts:
@@ -47,9 +50,6 @@ There are several types of publications on Bluesky, which might break your norma
     - their uri follow the pattern `at://{user_did}/app.bsky.graph.starterpack/{starter_pack_did}`
 
 When normalizing Bluesky posts, it is recommended to check the `type` field of the post payload to determine the type of publication and handle it accordingly.
-
-### **Tip** : Unique identifier of a post
-The unique identifier of a regular post on Bluesky is its `uri` field, which follows the pattern `at://{user_did}/app.bsky.feed.post/{post_did}`.
 
 ### **Issue** : Personalized links in post content
 The users have the possibility to publish content on Bluesky from a personal server, allowing them to personalize the data of their posts, including link encoding and placement. Consequently, the links/mentions found in the `text` field of a post payload might be shifted when the alignement on the link/mention characters is not done properly, especially if the text contains emojis or special characters. For examples:
