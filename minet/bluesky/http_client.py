@@ -122,7 +122,7 @@ class BlueskyHTTPClient:
                 e = data["error"]
                 if e == "UpstreamFailure":
                     raise BlueskyUpstreamFailureError(
-                        "Bluesky is currently experiencing upstream issues."
+                        f"HTTP {response.status}: Bluesky is currently experiencing upstream issues."
                     )
                 raise BlueskyBadRequestError(
                     f"HTTP {response.status} {e}: {data['message']}"
@@ -135,7 +135,12 @@ class BlueskyHTTPClient:
             if remaining <= 0:
                 self.need_to_wait_until_rate_limit_reset = True
 
-        self.rate_limit_reset = int(response.headers["RateLimit-Reset"])
+        if "RateLimit-Reset" in response.headers:
+            self.rate_limit_reset = int(response.headers["RateLimit-Reset"])
+        else:
+            console.print("No RateLimit-Reset header found in response.", style="yellow")
+            console.print(response.headers, highlight=True)
+            console.print(response, highlight=True)
 
         if response.status == 429:
             # We don't want to return the response in this case, as it indicates an error
