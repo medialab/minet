@@ -12,8 +12,6 @@ Note that when you reach the rate limit, you cannot connect to your Bluesky acco
 Sometimes, when doing too much requests in a short time, or when using some specific route with big quantities of data to retrieve, the Bluesky API raises errors. Here are the most commons of the unpredictable ones:
 - *ExpiredToken* (HTTP Status 400): Somehow happens after 2 hours on a request (which worked fine before). For now, it seems that it is raised when using [`app-bsky-feed-search-posts` route](https://docs.bsky.app/docs/api/app-bsky-feed-search-posts) on queries matching a very dense amount of posts in a short time range of publication. Associated Minet exception : `BlueskyExpiredToken`.
 - *HTTP Statuses 502*: the most common error raised by the API when doing many requests in a short time.
-
-[//]: # (TODO: find HTTP Status)
 - *UpstreamFailure*: happens sometimes when doing many requests in a short time. Associated Minet exception : `BlueskyUpstreamFailureError`.
 
 Minet bypass them by waiting and retrying automatically after a short period of time.
@@ -25,9 +23,6 @@ The `lang` field of a post payload is supposed to correspond to the language of 
 Indeed, the language detection algorithm is active only when the text reaches a certain length (115 characters according to our experiments), and even then, the user can choose not to have it applied. When not applied or when the text is too short, the `lang` field is set to the user preferred language, but the user can override it and set it to any value.
 
 To illustrate this issue, we made a collection of all posts having the `lang` attribute set to `fr` (French) using the `minet bsky search-posts "lang:fr"` command. In this collection, we found that only about 72% of the 32,969,538 posts are actually written in French when detecting their language using [Lingua Rust language detection library](https://docs.rs/lingua/latest/lingua/) on the post content.
-
-[//]: # (TODO: determine stats on:)
-[//]: # (- which proportion of the posts in french are we missing using `lang:fr` query using the dataset of the bsky-fr collection. From the actual collection that was made, it's about 24.25% of all french posts of the dataset, but we could get an actual real number if we backup all Bluesky posts using Tap)
 
 As a workaround, it is recommended to use a language detection library on the post content to determine its language more accurately.
 
