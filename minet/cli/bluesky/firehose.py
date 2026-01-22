@@ -1,6 +1,7 @@
 import websockets
 import json
-from datetime import timezone
+from queue import Queue
+from datetime import timezone, datetime
 
 # import libipld
 # import time
@@ -40,6 +41,10 @@ def action(cli_args, loading_bar: LoadingBar):
         since_timestamp = int(cli_args.since.timestamp() * 1_000_000)
         suffix += f"&cursor={since_timestamp}"
 
+    # registering last seen uris to avoid duplicates when reconnecting
+    # 50K posts is the number of posts published every 10 minutes on Bluesky
+    last_50k_uris = Queue(maxsize=50000)
+    most_recent_datetime:str = None
 
     client = BlueskyWebSocketClient()
 
@@ -65,18 +70,34 @@ def action(cli_args, loading_bar: LoadingBar):
                 if message.get("commit", {}).get("operation", "") not in ["delete", "update"]:
                     if message.get("commit", {}).get("operation", "") == "create":
                         partial_post = normalize_partial_post(message)
+                        if partial_post["uri"] in last_50k_uris.queue:
+                            continue  # skip duplicates in last 50k
+
                         row = format_partial_post_as_csv_row(
                             partial_post,
                         )
                         writer.writerow(row)
                         loading_bar.advance()
-                        pass
+                        if last_50k_uris.full():
+                            last_50k_uris.get()
+                        last_50k_uris.put(partial_post["uri"])
+                        most_recent_datetime = partial_post["local_time"]
                     else:
                         url = f"https://bsky.app/profile/{message.get('did', 'UNKNOWN')}/post/{message.get('commit', {}).get('rkey', 'UNKNOWN')}"
                         console.print(f"Unknown operation for this post: [blue]{url}[/blue]\n{message}", style="bold red")
             except websockets.ConnectionClosed as e:
-                console.print(f"Connection closed: {e}", highlight=True)
-                break
+                console.print(f"Connection closed: {e}\nreconnecting...", highlight=True)
+                suffix = "?wantedCollections=app.bsky.feed.post"
+                if most_recent_datetime:
+                    since_timestamp = int(datetime.strptime(most_recent_datetime, "%Y-%m-%dT%H:%M:%S.%f").timestamp() * 1_000_000)
+                else:
+                    since_timestamp = int(datetime.now().timestamp() * 1_000_000)
+                # getting back 5 minutes to avoid missing posts
+                since_timestamp -= 300 * 1_000_000
+                suffix += f"&cursor={since_timestamp}"
+                socket = client.subscribe_repos(True, suffix)
+                continue
+
             except KeyboardInterrupt:
                 console.print("Keyboard interrupt received. Exiting...")
                 break
