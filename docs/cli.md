@@ -2554,14 +2554,16 @@ Optional Arguments:
                                 date (YYYY-MM-DD, YYYY-MM-DDTHH, ...,
                                 YYYY-MM-DDTHH:mm:SSZ or
                                 YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to
-                                "since:<date>" in classic search syntax.
+                                "since:<date>" in classic search syntax, but the
+                                flag overwrites it when both are provided.
   --until UNTIL                 Filter results for posts before the indicated
                                 datetime (NOT inclusive). Expected to use
                                 'createdAt' timestamp, with a millisecond
                                 precision. Can be a datetime, or just an ISO
                                 date (YYYY-MM-DDTHH:mm:SSZ or
                                 YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to
-                                "until:<date>" in classic search syntax.
+                                "until:<date>" in classic search syntax, but the
+                                flag overwrites it when both are provided.
   --url URL                     Filter posts with links (facet links or embeds)
                                 pointing to this URL. Server may apply URL
                                 normalization or fuzzy matching. The only
@@ -2630,6 +2632,8 @@ Tips:
 Warning:
 
 - After some tests, it seems that the posts returned by the Bluesky API are not always perfectly sorted by the local time we give (with millisecond precision). Indeed, this local time depends on the 'createdAt' field of the post, and we observed that in some cases, this value is artificial (cf their indexation code : https://github.com/bluesky-social/indigo/blob/c5eaa30f683f959af20ea17fdf390d8a22d471cd/search/transform.go#L225).
+
+- The Bluesky search API seems to limit the number of results to 10,000 posts per query. To bypass this limitation, Minet pages the results using time ranges (with millisecond precision) when this limit is reached. However, due to this method, if there are more than 10,000 unique posts with the same datetime (with millisecond precision), we won't be able to get them all. Moreover, when reaching that limit and time paging, we noticed that Bluesky API doesn't return exactly the same 10,000 posts again: some new posts are found, but most are already seen, and most importantly it seems that there is no logic behind the order of these posts, meaning we are for now unable to ensure we retrieve the exact same posts when executing the same command multiple times... This issue is being investigated.
 
 how to use the command with a CSV file?
 
@@ -5554,7 +5558,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `2025-12-02`.
+                                today.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `2022-10-01`.
   --secret SECRET               Tiktok API identification secret. Can also be
@@ -5612,7 +5616,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `20251201`.
+                                today.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `20221001`.
   --secret SECRET               Tiktok API identification secret. Can also be

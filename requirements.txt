@@ -31,7 +31,7 @@ tenacity==8.2.1
 trafilatura==2.0.0
 typing_extensions>=4.3; python_version < '3.11'
 twitter==2.0a2
-twitwi==0.23.0
+twitwi==0.24.0
 ural==1.5.0
 urllib3==1.26.16
 websockets==13.1

@@ -102,6 +102,7 @@ Minet can single-handedly:
 - [Using minet from a Jupyter notebook](./docs/cookbook/notebooks/Minet%20in%20a%20Jupyter%20notebook.ipynb) (_very useful to experiment with the tool or teach students_)
 - [Downloading images associated with a given hashtag on Twitter](./docs/cookbook/twitter_images.md)
 - [Scraping DSL Tutorial](./docs/cookbook/scraping_dsl.md)
+- [Some Bluesky API issues/tips and how to handle them](./docs/cookbook/bsky_api_issues_and_tips.md)
 
 ## Features (from a technical standpoint)
 
