@@ -281,11 +281,11 @@ class BlueskyHTTPClient:
                 not oldest_uris_len_changed
                 and not oldest_date_changed
                 and cursor == old_cursor
-                and len(oldest_post_uris) <= 10000
+                and len(oldest_post_uris) <= 10_000
             ):
                 break
 
-            if len(oldest_post_uris) > 10000:
+            if len(oldest_post_uris) > 10_000:
                 oldest_post_timestamp_utc -= time_overlap
                 cursor = None  # to force time paging
 
