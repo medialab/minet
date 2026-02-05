@@ -73,7 +73,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     ),
                     int(cli_args.limit) if cli_args.limit else None,
                 ):
-                    post_row = format_post_as_csv_row(post)
+                    post_row = format_post_as_csv_row(post, allow_erroneous_plurals=True)
                     enricher.writerow(row, post_row)
                     loading_bar.nested_advance()
     else:
@@ -175,7 +175,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     loading_bar.nested_advance(len(batch))
                     loading_bar.inc_stat(query, len(batch), style="info")
                 for post in batch:
-                    post_row = format_post_as_csv_row(post)
+                    post_row = format_post_as_csv_row(post, allow_erroneous_plurals=True)
                     with locks["enricher"]:
                         enricher.writerow(row, post_row)
 

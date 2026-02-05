@@ -27,3 +27,6 @@ class BlueskyHandleNotFound(BlueskyError):
 
 class BlueskyRateLimitExceededError(BlueskyError):
     pass
+
+class BlueskyExpiredToken(BlueskyError):
+    pass
