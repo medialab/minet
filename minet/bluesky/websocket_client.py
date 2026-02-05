@@ -6,7 +6,7 @@ from websockets.exceptions import ConnectionClosedError
 
 from twitwi.bluesky import normalize_partial_post
 
-from minet.bluesky.constants import BLUESKY_FIREHOSE_BASE_URL,BLUESKY_FIREHOSE_JETSREAM_URLS
+from minet.bluesky.constants import BLUESKY_FIREHOSE_BASE_URL,BLUESKY_FIREHOSE_JETSTREAM_URLS
 
 # TODO: investigate libipld
 
@@ -14,7 +14,7 @@ from minet.bluesky.constants import BLUESKY_FIREHOSE_BASE_URL,BLUESKY_FIREHOSE_J
 class BlueskyWebSocketClient:
     def subscribe_repos(self, using_jetstream: bool = False, suffix: str = "") -> ClientConnection:
         if using_jetstream:
-            return connect("wss://" + BLUESKY_FIREHOSE_JETSREAM_URLS[1] + "/subscribe" + suffix)
+            return connect("wss://" + BLUESKY_FIREHOSE_JETSTREAM_URLS[1] + "/subscribe" + suffix)
         return connect(
             urljoin(BLUESKY_FIREHOSE_BASE_URL, "com.atproto.sync.subscribeRepos")
         )
@@ -23,7 +23,6 @@ class BlueskyWebSocketClient:
         return connect("ws://localhost:2480/channel")
 
     # Using Tap from a local Indigo instance
-    # example: go run ./cmd/tap run
     def get_data_from_local_tap(self) -> Iterator[dict]:
         with self.subscribe_local_tap() as ws:
             while True:
@@ -41,6 +40,7 @@ class BlueskyWebSocketClient:
                     record_type = data.get("record", {}).get("record", {}).get("$type", "").split(".")[-1]
                     if record_type == "post":
 
+                        # TODO: handle locale
                         normalized_post = normalize_partial_post(data, collection_source="tap")
                         yield normalized_post
 
@@ -50,6 +50,7 @@ class BlueskyWebSocketClient:
 
 
     # Doesn't work when we need to do a full backup (because of storage saturation on a free railway account)
+    # tuto from Bluesky: https://github.com/bluesky-social/indigo/blob/main/cmd/tap/RAILWAY_DEPLOY.md
     def subscribe_tap_railway(self, url: str, username: str = None, password: str = None) -> ClientConnection:
         if username and password:
             import base64

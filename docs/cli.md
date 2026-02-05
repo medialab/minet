@@ -1825,8 +1825,10 @@ Optional Arguments:
 Subcommands:
   {firehose,tap,posts,post-liked-by,post-quotes,post-reposted-by,resolve-handle,resolve-post-url,search-posts,search-profiles,profiles,profile-followers,profile-follows,profile-posts}
                                 Subcommand to use.
-    firehose                    Minet Bluesky Firehose command
-    tap                         Minet Bluesky Tap command (experimental)
+    firehose                    Minet Bluesky Firehose command (continuous live
+                                streaming of posts)
+    tap                         Minet Bluesky Tap command (continuous live and
+                                retrospective streaming of posts. Experimental)
     posts                       Minet Bluesky Get Post from URI or URL command
     post-liked-by               Minet Bluesky Get Liked By from URL or URI
                                 command
@@ -1853,20 +1855,20 @@ Usage: minet bluesky firehose [-h] [--since SINCE] [--silent]
                               [--refresh-per-second REFRESH_PER_SECOND]
                               [--simple-progress] [-o OUTPUT]
 
-# Minet Bluesky Firehose command
+# Minet Bluesky Firehose command (continuous live streaming of posts)
 
-Plug into the Bluesky Firehose.
+Plug into the Bluesky Firehose. The Bluesky Firehose is a continuous live stream of all the posts published on the platform. This command uses the Bluesky Jetstream firehose. Note that the Bluesky Jetstream firehose only allows to start from up to one day in the past using the `--since` flag.
 
 Optional Arguments:
   --since SINCE                 Start collecting posts from the given datetime
                                 (inclusive, timezone UTC). Note that the Bluesky
                                 Jetstream firehose only allows to start from up
                                 to one day in the past. Moreover, note that the
-                                date used correspons to the firehose event
+                                date used corresponds to the firehose event
                                 timestamp, only used for configuring or
                                 debugging the firehose itself, so it might not
-                                corresponds exactly to the first collected post
-                                dates.
+                                correspond exactly to the first collected post's
+                                date.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -1883,6 +1885,10 @@ Optional Arguments:
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
+
+Tips:
+
+- You can use partial ISO dates (YYYY or YYYY-MM or YYYY-MM-DD or YYYY-MM-DDTHH or YYYY-MM-DDTHH:MM or YYYY-MM-DDTHH:MM:SS or YYYY-MM-DDTHH:MM:SS.ssssss) for the --since argument, but Bluesky Firehose automatically caps the date to one day in the past, so you can use `--since 2000` to start from the earliest possible date.
 ```
 
 ### tap
@@ -1892,9 +1898,10 @@ Usage: minet bluesky tap [-h] [-o OUTPUT] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
                          [--simple-progress]
 
-# Minet Bluesky Tap command (experimental)
+# Minet Bluesky Tap command (continuous live and retrospective streaming of posts. Experimental)
 
-Plug into the Bluesky Tap socket. (experimental) Doc of Tap: https://docs.bsky.app/blog/introducing-tap
+Plug into the Bluesky Tap socket, a continuous live and retrospective streaming of posts (experimental). For now, it could only be used to create a full copy of the Atmosphere, but the Tap tool allows to synchronize only specific sets of it (as a set of profiles for example, see Tap documentation). Documentation of Tap: https://github.com/bluesky-social/indigo/blob/main/cmd/tap/README.md.
+For now, this command needs the parallel execution of a local Tap instance to work. You first need to clone the Indigo repository (https://github.com/bluesky-social/indigo) and then run Tap with the command `go run ./cmd/tap run --collection-filters=app.bsky.feed.post --signal-collection=app.bsky.feed.post` in the root of the cloned repository. This will synchronize all the posts from the beginning of time. For now, minet bluesky tap only supports the collection of posts, but not of other types of data, so we recommend to use the `--collection-filters` and `--signal-collection` flags with the value `app.bsky.feed.post` to avoid synchronizing unnecessary data. In an other terminal, you can then run the `minet bluesky tap` command to collect the posts. Note that the collection of the whole history of posts from the beginning of time can take several weeks, and that the storage space needed is about several terabytes.
 
 Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as

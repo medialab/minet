@@ -18,25 +18,31 @@ BLUESKY_HTTP_API_COMMON_ARGUMENTS = [
 BLUESKY_FIREHOSE_COMMAND = command(
     "firehose",
     "minet.cli.bluesky.firehose",
-    title="Minet Bluesky Firehose command",
+    title="Minet Bluesky Firehose command (continuous live streaming of posts)",
     description="""
-        Plug into the Bluesky Firehose.
+        Plug into the Bluesky Firehose. The Bluesky Firehose is a continuous live stream of all the posts published on the platform. This command uses the Bluesky Jetstream firehose. Note that the Bluesky Jetstream firehose only allows to start from up to one day in the past using the `--since` flag.
     """,
     arguments=[
         {
             "flag": "--since",
             "type": PartialISODatetimeType(False),
-            "help": "Start collecting posts from the given datetime (inclusive, timezone UTC). Note that the Bluesky Jetstream firehose only allows to start from up to one day in the past. Moreover, note that the date used correspons to the firehose event timestamp, only used for configuring or debugging the firehose itself, so it might not corresponds exactly to the first collected post dates.",
+            "help": "Start collecting posts from the given datetime (inclusive, timezone UTC). Note that the Bluesky Jetstream firehose only allows to start from up to one day in the past. Moreover, note that the date used corresponds to the firehose event timestamp, only used for configuring or debugging the firehose itself, so it might not correspond exactly to the first collected post's date.",
         }
-    ]
+    ],
+    epilog="""
+        Tips:
+
+        - You can use partial ISO dates (YYYY or YYYY-MM or YYYY-MM-DD or YYYY-MM-DDTHH or YYYY-MM-DDTHH:MM or YYYY-MM-DDTHH:MM:SS or YYYY-MM-DDTHH:MM:SS.ssssss) for the --since argument, but Bluesky Firehose automatically caps the date to one day in the past, so you can use `--since 2000` to start from the earliest possible date.
+    """,
 )
 
 BLUESKY_TAP_COMMAND = command(
     "tap",
     "minet.cli.bluesky.tap",
-    title="Minet Bluesky Tap command (experimental)",
+    title="Minet Bluesky Tap command (continuous live and retrospective streaming of posts. Experimental)",
     description="""
-        Plug into the Bluesky Tap socket. (experimental) Doc of Tap: https://docs.bsky.app/blog/introducing-tap
+        Plug into the Bluesky Tap socket, a continuous live and retrospective streaming of posts (experimental). For now, it could only be used to create a full copy of the Atmosphere, but the Tap tool allows to synchronize only specific sets of it (as a set of profiles for example, see Tap documentation). Documentation of Tap: https://github.com/bluesky-social/indigo/blob/main/cmd/tap/README.md.
+        For now, this command needs the parallel execution of a local Tap instance to work. You first need to clone the Indigo repository (https://github.com/bluesky-social/indigo) and then run Tap with the command `go run ./cmd/tap run --collection-filters=app.bsky.feed.post --signal-collection=app.bsky.feed.post` in the root of the cloned repository. This will synchronize all the posts from the beginning of time. For now, minet bluesky tap only supports the collection of posts, but not of other types of data, so we recommend to use the `--collection-filters` and `--signal-collection` flags with the value `app.bsky.feed.post` to avoid synchronizing unnecessary data. In an other terminal, you can then run the `minet bluesky tap` command to collect the posts. Note that the collection of the whole history of posts from the beginning of time can take several weeks, and that the storage space needed is about several terabytes.
     """,
     arguments=[
 

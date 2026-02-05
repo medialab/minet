@@ -24,9 +24,9 @@ from minet.bluesky.websocket_client import BlueskyWebSocketClient
 # JetStream doc
 # https://github.com/bluesky-social/jetstream#
 
-# It seems that the cursor param can be used to start from a given timestamp
-# (in microseconds since epoch) only up to one day in the past
-# uri = "wss://" + bsky_jetstream_public_instances[1] + "/subscribe?wantedCollections=app.bsky.feed.post&cursor=1733111630000000"
+# Firehose doc
+# https://docs.bsky.app/docs/advanced-guides/firehose
+
 
 @with_bluesky_fatal_errors
 @with_loading_bar(
@@ -37,6 +37,9 @@ def action(cli_args, loading_bar: LoadingBar):
 
     suffix = "?wantedCollections=app.bsky.feed.post"
     if cli_args.since:
+        # It seems that the cursor param can be used to start from a given timestamp
+        # (in microseconds since epoch) only up to one day in the past
+        # uri = "wss://" + bsky_jetstream_public_instances[1] + "/subscribe?wantedCollections=app.bsky.feed.post&cursor=1733111630000000"
         cli_args.since = cli_args.since.replace(tzinfo=timezone.utc)
         since_timestamp = int(cli_args.since.timestamp() * 1_000_000)
         suffix += f"&cursor={since_timestamp}"
@@ -69,6 +72,7 @@ def action(cli_args, loading_bar: LoadingBar):
 
                 if message.get("commit", {}).get("operation", "") not in ["delete", "update"]:
                     if message.get("commit", {}).get("operation", "") == "create":
+                        # TODO: handle locale
                         partial_post = normalize_partial_post(message, collection_source="firehose")
                         if partial_post["uri"] in last_50k_uris.queue:
                             continue  # skip duplicates in last 50k
