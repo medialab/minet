@@ -115,7 +115,7 @@ class BlueskyHTTPClient:
                 e = data["error"]
                 if e == "UpstreamFailure":
                     raise BlueskyUpstreamFailureError(
-                        "Bluesky is currently experiencing upstream issues."
+                        f"HTTP {response.status}: Bluesky is currently experiencing upstream issues."
                     )
                 raise BlueskyBadRequestError(
                     f"HTTP {response.status} {e}: {data['message']}"

@@ -39,9 +39,9 @@ class BlueskyWebSocketClient:
 
                     # should be: "app.bsky.feed.post"
                     record_type = data.get("record", {}).get("record", {}).get("$type", "").split(".")[-1]
-                    if record_type:
+                    if record_type == "post":
 
-                        normalized_post = normalize_partial_post(data, app_source="tap")
+                        normalized_post = normalize_partial_post(data, collection_source="tap")
                         yield normalized_post
 
                 except ConnectionClosedError:

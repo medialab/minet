@@ -69,7 +69,7 @@ def action(cli_args, loading_bar: LoadingBar):
 
                 if message.get("commit", {}).get("operation", "") not in ["delete", "update"]:
                     if message.get("commit", {}).get("operation", "") == "create":
-                        partial_post = normalize_partial_post(message)
+                        partial_post = normalize_partial_post(message, collection_source="firehose")
                         if partial_post["uri"] in last_50k_uris.queue:
                             continue  # skip duplicates in last 50k
 
