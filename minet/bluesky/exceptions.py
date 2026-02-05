@@ -23,3 +23,7 @@ class BlueskyUpstreamFailureError(BlueskyError):
 
 class BlueskyHandleNotFound(BlueskyError):
     pass
+
+
+class BlueskyExpiredToken(BlueskyError):
+    pass

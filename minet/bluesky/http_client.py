@@ -17,6 +17,7 @@ from minet.web import (
     Response,
 )
 
+
 from minet.bluesky.urls import (
     BlueskyHTTPAPIUrlFormatter,
     parse_post_url,
@@ -25,6 +26,7 @@ from minet.bluesky.urls import (
 from minet.bluesky.jwt import parse_jwt_for_expiration
 from minet.bluesky.exceptions import (
     BlueskyAuthenticationError,
+    BlueskyExpiredToken,
     BlueskySessionRefreshError,
     BlueskyBadRequestError,
     BlueskyUpstreamFailureError,
@@ -37,7 +39,8 @@ class BlueskyHTTPClient:
         self.urls = BlueskyHTTPAPIUrlFormatter()
         self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer(
-            additional_exceptions=[BlueskyUpstreamFailureError]
+            additional_exceptions=[BlueskyUpstreamFailureError, BlueskyExpiredToken],
+            retry_on_statuses=[502],
         )
         self.rate_limit_reset: Optional[int] = None
 
@@ -107,6 +110,7 @@ class BlueskyHTTPClient:
             json_body=json_body,
             known_encoding="utf-8",
             headers=headers,
+            raise_on_statuses=[502],
         )
 
         if response.status >= 400:
@@ -115,7 +119,13 @@ class BlueskyHTTPClient:
                 e = data["error"]
                 if e == "UpstreamFailure":
                     raise BlueskyUpstreamFailureError(
-                        f"HTTP {response.status}: Bluesky is currently experiencing upstream issues."
+                        f"Bluesky is currently experiencing upstream issues. (HTTP status {response.status})"
+                    )
+                # Somehow happens after 2 hours on a request (which worked fine before)
+                # It doesn't happen very often
+                if e == "ExpiredToken":
+                    raise BlueskyExpiredToken(
+                        f"{data['message']}. On url: {url} (HTTP {response.status})"
                     )
                 raise BlueskyBadRequestError(
                     f"HTTP {response.status} {e}: {data['message']}"
@@ -171,6 +181,8 @@ class BlueskyHTTPClient:
         oldest_uris_len_changed: bool = False
         old_len_oldest_post_uris = 0
 
+        old_cursor = None
+
         while True:
             request_url = self.urls.search_posts(
                 q=query,
@@ -191,6 +203,7 @@ class BlueskyHTTPClient:
                 break
 
             oldest_date_changed = False
+            oldest_uris_len_changed = False
             old_len_oldest_post_uris = len(oldest_post_uris)
             new_oldest_post_uris.clear()
 
@@ -199,8 +212,11 @@ class BlueskyHTTPClient:
                 if post["uri"] in oldest_post_uris:
                     continue
 
-                # TODO : handle locale + extract_referenced_posts + collected_via
-                yield normalize_post(post)
+                try:
+                    # TODO : handle locale + extract_referenced_posts + collected_via
+                    yield normalize_post(post)
+                except Exception as e:
+                    raise e
 
                 # Taking the minimum createdAt time to avoid issues
                 # with posts not being perfectly sorted by createdAt (local_time parameter is createdAt in UTC)
@@ -228,7 +244,9 @@ class BlueskyHTTPClient:
                             new_oldest_post_uris.add(post["uri"])
                     continue
 
+                # We have a new oldest post date
                 oldest_date_changed = True
+                oldest_uris_len_changed = True
                 new_oldest_post_uris.clear()
                 new_oldest_post_uris.add(post["uri"])
                 oldest_post_timestamp_utc = post_timestamp_utc
@@ -242,9 +260,34 @@ class BlueskyHTTPClient:
             # as oldest_post_uris is only changed by adding NEW uris,
             # and uris already in the set are ignored when added again, i.e. the set isn't changed,
             # except in the case where the oldest post date changes.
-            oldest_uris_len_changed = len(oldest_post_uris) != old_len_oldest_post_uris
+            if not oldest_date_changed:
+                oldest_uris_len_changed = (
+                    len(oldest_post_uris) > old_len_oldest_post_uris
+                )
 
             cursor = data.get("cursor")
+
+            # If the oldest post date did not change, no new uris were added to the "already seen uris" list,
+            # and the cursor didn't advance further it means we have reached the end of the available posts.
+            # NOTE: due to the 10,000 posts limit per search query and the method we use to page with time ranges,
+            #       if there is more than 10,000 unique posts with the same date, we won't be able to get them all.
+            #       Moreover, when reaching that limit and time paging, we noticed that Bluesky API doesn't return
+            #       exactly the same 10,000 posts again: some new posts are found, but most are already seen, and
+            #       most importantly it seems that there is no logic behind the order of these posts, meaning
+            #       we are for now unable to retrieve the exact same posts when executing the same command
+            #       multiple time...
+            #       To be investigated...
+            if (
+                not oldest_uris_len_changed
+                and not oldest_date_changed
+                and cursor == old_cursor
+                and len(oldest_post_uris) <= 10_000
+            ):
+                break
+
+            if len(oldest_post_uris) > 10_000:
+                oldest_post_timestamp_utc -= time_overlap
+                cursor = None  # to force time paging
 
             if cursor is None:
                 # NOTE: the until flag is exclusive
@@ -253,18 +296,23 @@ class BlueskyHTTPClient:
                 )
 
                 try:
+                    # NOTE: after some testing, it seems that Bluesky limits the number of results to 10,000 posts for search queries.
+                    #       That's why we now page with time ranges when we reach that limit, to reset it.
                     until = datetime.fromtimestamp(
                         oldest_post_timestamp_utc_plus_delta / 1000, tz=timezone.utc
                     ).strftime(SOURCE_DATETIME_FORMAT_V2)
+                    while "-" in until[:4]:
+                        until = "0" + until
                 except ValueError as e:
                     # Get your shit together Bluesky...
                     if "out of range" in str(e).lower():
                         break
 
-            # If the oldest post date did not change, and no new uris were added to the "already seen uris" list,
-            # it means we have reached the end of the available posts
-            if not oldest_uris_len_changed and not oldest_date_changed:
-                break
+            # If we added new uris (either with the same oldest post date or a new one, then we're seeing new posts)
+            # The only cases we don't update the old_cursor is when we are seeing the same posts again,
+            # at the beginning of a new time range page
+            if oldest_uris_len_changed:
+                old_cursor = cursor
 
     def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
