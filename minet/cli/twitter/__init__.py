@@ -598,6 +598,16 @@ TWITTER_TWEETS_SUBCOMMAND = command(
             "help": "Bypass confirmation.",
             "action": "store_true",
         },
+        {
+            "flag": "--unlogged",
+            "help": "Whether to use an unauthenticated scraping mode (might be more limited).",
+            "action": "store_true",
+        },
+        {
+            "flag": "--raw",
+            "help": "Return the raw tweet data in JSON as received from the API instead of a normalized version.",
+            "action": "store_true",
+        }
     ],
 )
 
