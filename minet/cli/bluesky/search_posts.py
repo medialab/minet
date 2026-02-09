@@ -79,6 +79,11 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     else:
 
         number_of_threads = cli_args.threads if cli_args.threads else int(os.cpu_count() * 0.75) or 1
+        global thread_index
+        thread_index = 0
+
+        if len(cli_args.id_password)<number_of_threads:
+            raise ValueError(f"Not enough couples of id-password provided for the number of threads. {len(cli_args.id_password)} couples provided for {number_of_threads} threads.")
 
         global remaining_subqueries_per_query
         remaining_subqueries_per_query = {}
@@ -145,8 +150,12 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
         thread_data = threading.local()
 
         def initialize_client():
+            global thread_index
             with locks["cli_args"]:
-                thread_data.client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
+                thread_data.client = BlueskyHTTPClient(cli_args.id_password[thread_index]["identifier"], cli_args.id_password[thread_index]["password"])
+                # debug purposes
+                # thread_data.index = thread_index
+                thread_index += 1
 
         def batched(iterable, n, *, strict=False):
             # batched('ABCDEFG', 2) → AB CD EF G

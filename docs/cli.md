@@ -2502,7 +2502,8 @@ Usage: minet bluesky search-posts [-h] [--lang LANG] [--silent]
                                   [--until UNTIL] [--mentions MENTIONS]
                                   [--author AUTHOR] [--domain DOMAIN]
                                   [--url URL] [-l LIMIT] [-p] [-t THREADS]
-                                  [--identifier IDENTIFIER] [--rcfile RCFILE]
+                                  [--id-password ID_PASSWORD] [--rcfile RCFILE]
+                                  [--identifier IDENTIFIER]
                                   [--password PASSWORD] [-i INPUT]
                                   [--explode EXPLODE] [-s SELECT]
                                   [--total TOTAL] [-o OUTPUT]
@@ -2510,7 +2511,7 @@ Usage: minet bluesky search-posts [-h] [--lang LANG] [--silent]
 
 # Minet Bluesky Search Post command
 
-Search for whether Bluesky posts matching a query or multiple Bluesky posts matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API.
+Search for whether Bluesky posts matching a query or multiple Bluesky posts matching respectively successives queries from column of a CSV file (note that doing so does not guarantee uniqueness of the results, due to potential overlaps in the result of each query). This command uses the Bluesky HTTP API.
 
 Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
@@ -2525,6 +2526,15 @@ Optional Arguments:
                                 linking to the given domain (hostname). Server
                                 may apply hostname normalization. Equivalent to
                                 "domain:<domain>" in classic search syntax.
+  --id-password ID_PASSWORD     List of couples of Bluesky identifier and app
+                                password (not your personal password, must be
+                                created here:
+                                https://bsky.app/settings/app-passwords), with
+                                the format {identifier: <identifier>, password:
+                                <app_password>}. To use with -p/--parallel. Can
+                                also be configured in a .minetrc file as
+                                "bluesky.id_password" or read from the
+                                MINET_BLUESKY_ID_PASSWORD env variable.
   --identifier IDENTIFIER       Bluesky personal identifier (don't forget the
                                 `.bsky.social` at the end). Can also be
                                 configured in a .minetrc file as

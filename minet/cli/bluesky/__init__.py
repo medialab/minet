@@ -399,6 +399,12 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
             "type": int,
             "help": "Number of threads to use for parallel requests when the -p/--parallel flag is set. Default is 3/4 of number of CPU cores. Note that the Bluesky API rate limits to ~1000 posts/s, so using too many threads may lead to rate limiting.",
         },
+        {
+            "flag": "--id-password",
+            "help": "List of couples of Bluesky identifier and app password (not your personal password, must be created here: https://bsky.app/settings/app-passwords), with the format {identifier: <identifier>, password: <app_password>}. To use with -p/--parallel.",
+            "rc_key": ["bluesky", "id_password"],
+            "action": ConfigAction,
+        },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
     epilog="""
