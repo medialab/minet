@@ -145,10 +145,6 @@ class BlueskyHTTPClient:
 
         if "RateLimit-Reset" in response.headers:
             self.rate_limit_reset = int(response.headers["RateLimit-Reset"])
-        else:
-            console.print("No RateLimit-Reset header found in response.", style="yellow")
-            console.print(response.headers, highlight=True)
-            console.print(response, highlight=True)
 
         if response.status == 429:
             # We don't want to return the response in this case, as it indicates an error
@@ -347,11 +343,6 @@ class BlueskyHTTPClient:
             # at the beginning of a new time range page
             if oldest_uris_len_changed:
                 old_cursor = cursor
-
-        oldest_post_datetime = datetime.fromtimestamp(
-            oldest_post_timestamp_utc / 1000, tz=timezone.utc
-        ).strftime(SOURCE_DATETIME_FORMAT_V2)
-        console.print(f"Query [blue]{query}[/blue] ended. Oldest post datetime: [blue]{oldest_post_datetime}[/blue]", style="yellow")
 
 
     def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
