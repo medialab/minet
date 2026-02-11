@@ -86,7 +86,7 @@ class YouTubeVideo(YouTubeVideoSnippet):
     # dislike_count: int # NOTE: This property is deprecated since december 13th 2021.
     # favorite_count: int # NOTE: This property has been deprecated by YouTube in 2015. The property's value is now always set to 0.
     comment_count: Optional[int]
-    duration: str
+    duration: Optional[str]
     has_captions: bool
     category_id: str
     category: Optional[str]
@@ -116,7 +116,7 @@ class YouTubeVideo(YouTubeVideoSnippet):
             view_count=get_int(stats, "viewCount"),
             like_count=get_int(stats, "likeCount"),
             comment_count=get_int(stats, "commentCount"),
-            duration=details["duration"],
+            duration=details.get("duration"),
             has_captions=details["caption"] == "true",
             tags=snippet.get("tags", []),
             topics=topics,

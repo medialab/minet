@@ -63,6 +63,6 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                 ),
                 int(cli_args.limit) if cli_args.limit else None,
             ):
-                post_row = format_post_as_csv_row(post)
+                post_row = format_post_as_csv_row(post, allow_erroneous_plurals=True)
                 enricher.writerow(row, post_row)
                 loading_bar.nested_advance()
