@@ -119,6 +119,7 @@ def action_raw(cli_args, loading_bar: LoadingBar):
                 writer.writerow({})
                 continue
 
+
 def action(cli_args):
     if cli_args.raw:
         action_raw(cli_args)

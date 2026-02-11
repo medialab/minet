@@ -607,7 +607,7 @@ TWITTER_TWEETS_SUBCOMMAND = command(
             "flag": "--raw",
             "help": "Return the raw tweet data in JSON as received from the API instead of a normalized version.",
             "action": "store_true",
-        }
+        },
     ],
 )
 

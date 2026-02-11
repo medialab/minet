@@ -1021,7 +1021,7 @@ class TwitterUnauthenticatedAPIScraper:
     def request(self, url: str) -> Response:
         return request(url, pool_manager=self.pool_manager)
 
-    def get_tweet(self, tweet_id: str, locale=None):
+    def get_tweet(self, tweet_id: str):
         random_token = randint(0, 0xFFFFFFFF)
 
         url = "https://cdn.syndication.twimg.com/tweet-result?id={}&token={}".format(
@@ -1033,7 +1033,7 @@ class TwitterUnauthenticatedAPIScraper:
         return data
 
     def get_normalized_tweet(self, tweet_id: str, locale=None):
-        raw_tweet = self.get_tweet(tweet_id, locale=locale)
+        raw_tweet = self.get_tweet(tweet_id)
         normalized_tweet = normalize_tweet(
             raw_tweet,
             locale=locale,
