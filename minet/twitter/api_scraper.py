@@ -1034,9 +1034,11 @@ class TwitterUnauthenticatedAPIScraper:
 
     def get_normalized_tweet(self, tweet_id: str, locale=None):
         raw_tweet = self.get_tweet(tweet_id)
+
         normalized_tweet = normalize_tweet(
             raw_tweet,
             locale=locale,
-            source_version="no_api_key",
+            source_version="iframe",
         )
+
         return normalized_tweet
