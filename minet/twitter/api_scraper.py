@@ -1028,12 +1028,17 @@ class TwitterUnauthenticatedAPIScraper:
             tweet_id, random_token
         )
 
-        data = self.request(url).json()
+        response = self.request(url)
+
+        data: dict = response.json() if response.status == 200 else {}
 
         return data
 
     def get_normalized_tweet(self, tweet_id: str, locale=None):
         raw_tweet = self.get_tweet(tweet_id)
+
+        if not raw_tweet:
+            return {}
 
         normalized_tweet = normalize_tweet(
             raw_tweet,
