@@ -574,7 +574,7 @@ TWITTER_TWEETS_SUBCOMMAND = command(
     "minet.cli.twitter.tweets",
     title="Minet Twitter Tweets Command",
     description="""
-        Collecting tweet metadata by scraping the website.
+        Collecting tweet metadata by scraping iframes of the website.
     """,
     epilog="""
         Examples:
@@ -582,20 +582,12 @@ TWITTER_TWEETS_SUBCOMMAND = command(
         . Getting metadata from tweets in a CSV file:
             $ minet tw tweets tweet_id -i tweets.csv > tweets_metadata.csv
     """,
-    resolve=twitter_scrape_confirm,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
     resumer=RowCountResumer,
     arguments=[
         {
-            "flags": ["-c", "--cookie"],
-            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").',
-            "default": "firefox",
-            "rc_key": ["twitter", "cookie"],
-            "action": ConfigAction,
-        },
-        {
-            "flags": ["-f", "--force"],
-            "help": "Bypass confirmation.",
+            "flag": "--raw",
+            "help": "Return the raw tweet data in JSON as received from the API instead of a normalized version.",
             "action": "store_true",
         },
     ],
