@@ -4,7 +4,7 @@
 ## Issues/Tips related to Bluesky API in general
 
 ### **Tip** : App passwords and rate limit
-When using the `minet bsky` command, you need to be registered using [App passwords](https://bsky.app/settings/app-passwords). There is a rate limit for an app password of 3000 requests per 5 minutes (i.e. 600 requests per minute, or 10 requests per second). This limit is shared across all the commands using an app password associated to the same Bluesky account, and is almost never reached when calling one command at a time. However, if you plan to do a large number of requests, and due to the slowness of response, it is recommended to call multiple commands in parallel (e.g. using `tmux` sessions). Note that it does not matter if the commands are using the same app password or not, as the rate limit is shared across all app passwords associated to the same Bluesky account.
+When using the `minet bsky` command, you need to be registered using [App passwords](https://bsky.app/settings/app-passwords). There is a rate limit for an account of 3000 requests per 5 minutes (i.e. 600 requests per minute, or 10 requests per second). This limit is shared across all the commands associated to the same Bluesky account, and is almost never reached when calling one command at a time. However, if you plan to do a large number of requests, and due to the slowness of response, it is recommended to call multiple commands in parallel (e.g. using `tmux` sessions). Note that it does not matter if the commands are using the same app password or not, as the rate limit is shared across all app passwords associated to the same Bluesky account. This is why it is recommended to use multiple accounts when doing a large number of requests in a short time, to bypass the rate limit (using `-p/--parallel` when using `minet bluesky search-posts` for instance).
 
 Note that when you reach the rate limit, you cannot connect to your Bluesky account until the limit is reset (you then need to wait about 5 minutes).
 
@@ -12,7 +12,7 @@ Note that when you reach the rate limit, you cannot connect to your Bluesky acco
 Sometimes, when doing too much requests in a short time, or when using some specific route with big quantities of data to retrieve, the Bluesky API raises errors. Here are the most commons of the unpredictable ones:
 - *ExpiredToken* (HTTP Status 400): Somehow happens after 2 hours on a request (which worked fine before). For now, it seems that it is raised when using [`app-bsky-feed-search-posts` route](https://docs.bsky.app/docs/api/app-bsky-feed-search-posts) on queries matching a very dense amount of posts in a short time range of publication. Associated Minet exception : `BlueskyExpiredToken`.
 - *HTTP Statuses 502*: the most common error raised by the API when doing many requests in a short time.
-- *UpstreamFailure*: happens sometimes when doing many requests in a short time. Associated Minet exception : `BlueskyUpstreamFailureError`.
+- *UpstreamFailure* (HTTP status 502 too): happens sometimes when doing many requests in a short time. Associated Minet exception : `BlueskyUpstreamFailureError`.
 
 Minet bypass them by waiting and retrying automatically after a short period of time.
 
