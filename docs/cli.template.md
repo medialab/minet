@@ -30,6 +30,7 @@ _Platform-related commands_
   - [post-liked-by](#post-liked-by)
   - [post-quotes](#post-quotes)
   - [post-reposted-by](#post-reposted-by)
+  - [post-thread](#post-thread)
   - [resolve-handle](#resolve-handle)
   - [resolve-post-url](#resolve-post-url)
   - [search-posts](#search-posts)
@@ -236,6 +237,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### post-reposted-by
 
 <% bsky/post-reposted-by %>
+
+### post-thread
+
+<% bsky/post-thread %>
 
 ### resolve-handle
 

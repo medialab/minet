@@ -301,6 +301,29 @@ BLUESKY_POST_REPOSTED_BY_COMMAND = command(
     """,
 )
 
+BLUESKY_POST_THREAD_COMMAND = command(
+    "post-thread",
+    "minet.cli.bluesky.post_thread",
+    title="Minet Bluesky Get Thread of a Post from URL or URI command",
+    description="""
+        Get posts in a thread of a post giving its URL or URI or several threads of posts giving their URL or URI from the column of a CSV file. This command uses the Bluesky HTTP API.
+    """,
+    arguments=[
+        {
+            "flags": ["-d", "--depth"],
+            "type": int,
+            "help": "Depth of the thread to retrieve. Will get 6 posts in the thread by default. Maximum is 1000.",
+        },
+        {
+            "flags": ["-p", "--parent-height"],
+            "type": int,
+            "help": "Height of the parent posts to retrieve. Will get 80 parent posts by default. Maximum is 1000.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
+    variadic_input={"dummy_column": "post"},
+)
+
 BLUESKY_RESOLVE_POST_URL_COMMAND = command(
     "resolve-post-url",
     "minet.cli.bluesky.resolve_post_url",
@@ -474,6 +497,7 @@ BLUESKY_COMMAND = command(
         BLUESKY_POST_LIKED_BY_COMMAND,
         BLUESKY_POST_QUOTES_COMMAND,
         BLUESKY_POST_REPOSTED_BY_COMMAND,
+        BLUESKY_POST_THREAD_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,
         BLUESKY_RESOLVE_POST_URL_COMMAND,
         BLUESKY_SEARCH_POSTS_COMMAND,
