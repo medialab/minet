@@ -4,7 +4,7 @@
 #
 # Twitter public API "scraper".
 #
-from typing import Optional
+from typing import Optional, Dict
 
 import time
 import json
@@ -1021,7 +1021,7 @@ class TwitterUnauthenticatedAPIScraper:
     def request(self, url: str) -> Response:
         return request(url, pool_manager=self.pool_manager)
 
-    def get_tweet(self, tweet_id: str):
+    def get_tweet(self, tweet_id: str) -> Optional[Dict]:
         random_token = randint(0, 0xFFFFFFFF)
 
         url = "https://cdn.syndication.twimg.com/tweet-result?id={}&token={}".format(
@@ -1030,11 +1030,12 @@ class TwitterUnauthenticatedAPIScraper:
 
         response = self.request(url)
 
-        data: dict = response.json() if response.status == 200 else None
+        if response.status == 200:
+            return None
 
-        return data
+        return response.json()
 
-    def get_normalized_tweet(self, tweet_id: str, locale=None):
+    def get_normalized_tweet(self, tweet_id: str, locale=None) -> Optional[Dict]:
         raw_tweet = self.get_tweet(tweet_id)
 
         if not raw_tweet:

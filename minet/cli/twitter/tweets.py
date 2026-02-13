@@ -64,7 +64,7 @@ def action_raw(cli_args, loading_bar: LoadingBar):
                     tweet_id = parsed.id
 
             tweet = scraper.get_tweet(tweet_id)
-            tweet = {'tweet_id': tweet_id, 'tweet': tweet}
+            tweet = {"tweet_id": tweet_id, "tweet": tweet}
             writer.writerow(tweet)
 
 
