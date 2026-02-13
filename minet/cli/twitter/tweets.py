@@ -36,8 +36,11 @@ def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                     tweet_id = parsed.id
 
             tweet = scraper.get_normalized_tweet(tweet_id)
-            tweet = format_tweet_as_csv_row(tweet)
-            enricher.writerow(row, tweet)
+            if tweet:
+                tweet = format_tweet_as_csv_row(tweet)
+                enricher.writerow(row, tweet)
+            else:
+                enricher.writerow(row)
 
 
 @with_loading_bar(
@@ -61,6 +64,7 @@ def action_raw(cli_args, loading_bar: LoadingBar):
                     tweet_id = parsed.id
 
             tweet = scraper.get_tweet(tweet_id)
+            tweet = {'tweet_id': tweet_id, 'tweet': tweet}
             writer.writerow(tweet)
 
 

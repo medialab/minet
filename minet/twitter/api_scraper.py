@@ -1030,7 +1030,7 @@ class TwitterUnauthenticatedAPIScraper:
 
         response = self.request(url)
 
-        data: dict = response.json() if response.status == 200 else {}
+        data: dict = response.json() if response.status == 200 else None
 
         return data
 
@@ -1038,7 +1038,7 @@ class TwitterUnauthenticatedAPIScraper:
         raw_tweet = self.get_tweet(tweet_id)
 
         if not raw_tweet:
-            return {}
+            return None
 
         normalized_tweet = normalize_tweet(
             raw_tweet,
