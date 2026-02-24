@@ -16,7 +16,7 @@ post_reposted_by_headers = ["reposting_user_" + i for i in PARTIAL_PROFILE_FIELD
 
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=post_reposted_by_header,
+    headers=post_reposted_by_headers,
     title="Getting list of reposts for Bluesky posts",
     unit="posts",
     nested=True,
