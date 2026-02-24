@@ -12,10 +12,11 @@ from minet.cli.bluesky.utils import with_bluesky_fatal_errors
 
 from minet.bluesky import BlueskyHTTPClient
 
+post_reposted_by_headers = ["reposting_user_" + i for i in PARTIAL_PROFILE_FIELDS]
 
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=PARTIAL_PROFILE_FIELDS,
+    headers=post_reposted_by_header,
     title="Getting list of reposts for Bluesky posts",
     unit="posts",
     nested=True,
