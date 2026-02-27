@@ -156,6 +156,26 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
+    def post_thread(self, post_uri: str, depth: Optional[int] = None, parent_height: Optional[int] = None) -> Iterator[BlueskyPost]:
+        url = self.urls.post_thread(post_uri, depth=depth, parent_height=parent_height)
+        response = self.request(url)
+        data = response.json()
+
+        thread = data.get("thread", {})
+
+        yield from self.yield_post_tree(thread, "replies", "parent")
+
+    def yield_post_tree(self, thread: dict, child_field: str, parent_field: str) -> Iterator[BlueskyPost]:
+        if thread.get("$type") != "app.bsky.feed.defs#threadViewPost":
+            raise ValueError(f"Expected threadViewPost type, got {thread.get('$type')}")
+        if thread.get("post"):
+            yield normalize_post(thread["post"])
+        if thread.get(child_field, []):
+            for child in thread[child_field]:
+                yield from self.yield_post_tree(child, child_field, parent_field)
+        if thread.get(parent_field, []):
+            yield from self.yield_post_tree(thread[parent_field], child_field, parent_field)
+
     def search_posts(
         self,
         query: str,
