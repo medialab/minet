@@ -3,6 +3,7 @@ from typing import Iterator, Iterable, Optional, Any, List, Dict, Union
 from time import time, sleep
 from datetime import datetime, timezone
 from ebbe import as_reconciled_chunks
+import json
 
 from twitwi.utils import get_dates
 from twitwi.bluesky import normalize_profile, normalize_post, normalize_partial_profile
@@ -31,7 +32,9 @@ from minet.bluesky.exceptions import (
     BlueskyBadRequestError,
     BlueskyUpstreamFailureError,
     BlueskyHandleNotFound,
+    BlueskyRateLimitExceededError
 )
+from minet.cli.console import console
 
 
 class BlueskyHTTPClient:
@@ -39,10 +42,10 @@ class BlueskyHTTPClient:
         self.urls = BlueskyHTTPAPIUrlFormatter()
         self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer(
-            additional_exceptions=[BlueskyUpstreamFailureError, BlueskyExpiredToken],
-            retry_on_statuses=[502],
+            additional_exceptions=[BlueskyUpstreamFailureError, BlueskyRateLimitExceededError, BlueskyExpiredToken], retry_on_statuses=[502]
         )
         self.rate_limit_reset: Optional[int] = None
+        self.need_to_wait_until_rate_limit_reset = False
 
         # First auth
         self.create_session(identifier, password)
@@ -94,9 +97,10 @@ class BlueskyHTTPClient:
         method: str = "GET",
         json_body=None,
     ) -> Response:
-        if self.rate_limit_reset is not None:
-            sleep(self.rate_limit_reset - time() + 0.1)
-            self.rate_limit_reset = None
+        if self.need_to_wait_until_rate_limit_reset:
+            # Using max to avoid negative sleep time
+            sleep(max(0, self.rate_limit_reset - time() + 1))
+            self.need_to_wait_until_rate_limit_reset = False
 
         if self.is_access_jwt_expired():
             self.refresh_session()
@@ -113,7 +117,8 @@ class BlueskyHTTPClient:
             raise_on_statuses=[502],
         )
 
-        if response.status >= 400:
+        # HTTP status 429 is rate limiting, we handle it separately
+        if response.status != 429 and response.status >= 400:
             data = response.json()
             if "error" in data:
                 e = data["error"]
@@ -132,10 +137,29 @@ class BlueskyHTTPClient:
                 )
             raise BlueskyBadRequestError(f"HTTP {response.status}")
 
-        remaining = int(response.headers["RateLimit-Remaining"])
+        if "RateLimit-Remaining" in response.headers:
+            remaining = int(response.headers["RateLimit-Remaining"])
 
-        if remaining <= 0:
+            if remaining <= 0:
+                self.need_to_wait_until_rate_limit_reset = True
+
+        if "RateLimit-Reset" in response.headers:
             self.rate_limit_reset = int(response.headers["RateLimit-Reset"])
+
+        if response.status == 429:
+            # We don't want to return the response in this case, as it indicates an error
+            # and it will stop the normal flow of the program
+
+            if response.headers.get("Content-Length") == "0" and response.headers.get("x-ratelimit-limit") == "3000 per five minutes":
+                # Sometimes Bluesky returns an empty response with 429 status code
+                # and no useful information, so we just wait and retry
+                self.need_to_wait_until_rate_limit_reset = True
+
+            if self.need_to_wait_until_rate_limit_reset:
+                response = self.request(url, method=method, json_body=json_body)
+                self.need_to_wait_until_rate_limit_reset = False
+            else:
+                raise BlueskyRateLimitExceededError() # Will retry the request after sleeping
 
         return response
 
@@ -197,7 +221,13 @@ class BlueskyHTTPClient:
             )
 
             response = self.request(request_url)
-            data = response.json()
+            try:
+                # had an error here once, so let's be safe and catch it to see the raw response
+                # when it happens again
+                data = response.json()
+            except json.decoder.JSONDecodeError:
+                console.print(f"[red]Failed to decode JSON response from Bluesky API.[/red] Here's the raw response:\n{response}", highlight=True)
+                continue
 
             if "posts" not in data or len(data["posts"]) == 0:
                 break
@@ -313,6 +343,7 @@ class BlueskyHTTPClient:
             # at the beginning of a new time range page
             if oldest_uris_len_changed:
                 old_cursor = cursor
+
 
     def search_profiles(self, query: str) -> Iterator[BlueskyPartialProfile]:
         cursor = None
