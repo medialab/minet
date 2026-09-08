@@ -258,7 +258,7 @@ RESOLVE_COMMAND = command(
             $ minet resolve url_column -i file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
-            $ xan select url_column file.csv | minet resolve url_column - > report.csv
+            $ xan select url_column file.csv | minet resolve url_column -i - > report.csv
 
         . Resolving a single url:
             $ minet resolve https://lemonde.fr
@@ -330,7 +330,7 @@ SCREENSHOT_COMMAND = command(
             $ minet screenshot url_column -i file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
-            $ xan select url_column file.csv | minet screenshot url_column - > report.csv
+            $ xan select url_column file.csv | minet screenshot url_column -i - > report.csv
 
         . Screenshot a single url:
             $ minet screenshot https://lemonde.fr

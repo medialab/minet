@@ -1090,7 +1090,7 @@ Examples:
     $ minet resolve url_column -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
-    $ xan select url_column file.csv | minet resolve url_column - > report.csv
+    $ xan select url_column file.csv | minet resolve url_column -i - > report.csv
 
 . Resolving a single url:
     $ minet resolve https://lemonde.fr
@@ -1448,7 +1448,7 @@ Examples:
     $ minet screenshot url_column -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
-    $ xan select url_column file.csv | minet screenshot url_column - > report.csv
+    $ xan select url_column file.csv | minet screenshot url_column -i - > report.csv
 
 . Screenshot a single url:
     $ minet screenshot https://lemonde.fr
@@ -5558,7 +5558,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `2026-02-11`.
+                                `2026-09-08`.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `2022-10-01`.
   --secret SECRET               Tiktok API identification secret. Can also be
@@ -5616,7 +5616,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `20260210`.
+                                `20260907`.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `20221001`.
   --secret SECRET               Tiktok API identification secret. Can also be
