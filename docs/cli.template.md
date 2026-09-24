@@ -26,6 +26,8 @@ _Generic commands_
 _Platform-related commands_
 
 - [bluesky (bsky)](#bluesky)
+  - [firehose](#firehose)
+  - [tap](#tap)
   - [posts](#posts)
   - [post-liked-by](#post-liked-by)
   - [post-quotes](#post-quotes)
@@ -220,6 +222,14 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ## Bluesky
 
 <% bsky %>
+
+### firehose
+
+<% bsky/firehose %>
+
+### tap
+
+<% bsky/tap %>
 
 ### posts
 
