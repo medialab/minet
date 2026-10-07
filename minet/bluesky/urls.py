@@ -151,3 +151,9 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
                 "limit": limit,
             },
         )
+
+    def post_thread(self, post_uri: str, depth: Optional[int] = None, parent_height: Optional[int] = None) -> str:
+        return self.format(
+            path="app.bsky.feed.getPostThread",
+            args={"uri": post_uri, "depth": depth, "parentHeight": parent_height},
+        )
