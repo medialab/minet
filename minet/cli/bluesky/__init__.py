@@ -350,7 +350,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
     "minet.cli.bluesky.search_posts",
     title="Minet Bluesky Search Post command",
     description="""
-        Search for whether Bluesky posts matching a query or multiple Bluesky posts matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API.
+        Search for whether Bluesky posts matching a query or multiple Bluesky posts matching respectively successives queries from column of a CSV file (note that doing so does not guarantee uniqueness of the results, due to potential overlaps in the result of each query). This command uses the Bluesky HTTP API.
     """,
     variadic_input={"dummy_column": "query"},
     arguments=[
@@ -388,6 +388,22 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
             "flags": ["-l", "--limit"],
             "type": int,
             "help": "Limit the number of posts to retrieve for each query.",
+        },
+        {
+            "flags": ["-p", "--parallel"],
+            "action": "store_true",
+            "help": "Use parallel requests to speed up the collection of posts. Note that using this flag will make the output order non-deterministic (posts from different queries may be interleaved, and may be disordered).",
+        },
+        {
+            "flags": ["-t", "--threads"],
+            "type": int,
+            "help": "Number of threads to use for parallel requests when the -p/--parallel flag is set. Default is 3/4 of number of CPU cores. Note that the Bluesky API rate limits to ~1000 posts/s, so using too many threads may lead to rate limiting.",
+        },
+        {
+            "flag": "--id-password",
+            "help": "List of couples of Bluesky identifier and app password (not your personal password, must be created here: https://bsky.app/settings/app-passwords), with the format {identifier: <identifier>, password: <app_password>}. To use with -p/--parallel.",
+            "rc_key": ["bluesky", "id_password"],
+            "action": ConfigAction,
         },
         *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
     ],
